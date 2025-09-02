@@ -1,225 +1,278 @@
+#!/usr/bin/env python3
 """
-Convert SPOT-generated automata (from TLSF) to AALpy-compatible oracles for active learning.
+Convert SPOT-generated automata (from TLSF) to AALpy-compatible oracles for active learning,
+learn a Mealy machine, and export both oracle and learned automata to HOA.
 
 Usage:
-    python spot_to_aalpy.py input.dot
+    python spot_to_aalpy.py input.dot [--inputs a,b] [--outputs p0,p1] [algorithm] [eq_oracle]
+
+Args:
+    --inputs: comma-separated list of input propositions (e.g., a,b)
+    --outputs: comma-separated list of output propositions (e.g., p0,p1)
+    algorithm: lstar (default) or kv
+    eq_oracle: random_walk (default) or w_method
 """
 
+import os
 import re
 import sys
+import argparse
 from collections import defaultdict
 from itertools import product
+from typing import List, Dict, Any, Optional
+
 from aalpy.SULs import SUL
 from aalpy.learning_algs import run_Lstar
 from aalpy.oracles import RandomWalkEqOracle, WMethodEqOracle
 from aalpy.utils import save_automaton_to_file, visualize_automaton
 
+# -------------------------------
+# SPOT DOT -> AALpy SUL wrapper
+# -------------------------------
 
 class SpotAutomatonOracle(SUL):
     """
     Oracle wrapper for SPOT-generated automaton.
     Implements AALpy's SUL (System Under Learning) interface.
     """
-    
-    def __init__(self, dot_file_path):
+
+    def __init__(self, dot_file_path: str, input_props: List[str], output_props: List[str]):
         super().__init__()
         self.dot_file = dot_file_path
-        self.automaton = self._parse_dot_file(dot_file_path)
+        self.input_props = input_props
+        self.output_props = output_props
+        self.automaton = self._parse_dot_file(dot_file_path)  # keeps acceptance sets
         self.propositions = self._extract_propositions()
-        self.alphabet = self._generate_alphabet()
+        self.alphabet = self._generate_input_alphabet()
         self.current_state = self.automaton['initial']
-        
+
         # Create transition lookup table for efficiency
         self.transition_map = self._build_transition_map()
-        
+
         print(f"Loaded automaton from {dot_file_path}")
         print(f"  States: {len(self.automaton['states'])}")
-        print(f"  Propositions: {self.propositions}")
-        print(f"  Alphabet size: {len(self.alphabet)}")
-    
-    def _parse_dot_file(self, filepath):
-        """Parse SPOT-generated DOT file."""
+        print(f"  Input propositions: {self.input_props}")
+        print(f"  Output propositions: {self.output_props}")
+        print(f"  Input alphabet size: {len(self.alphabet)}")
+
+    def _parse_dot_file(self, filepath: str) -> Dict[str, Any]:
+        """Parse SPOT-generated DOT file, keeping acceptance sets on edges."""
         with open(filepath, 'r') as f:
             content = f.read()
-        
-        # Extract states
+
+        # States (SPOT uses numeric ids with label="<same id>")
         states = set()
         state_pattern = r'^\s*(\d+)\s+\[label="(\d+)"\]'
-        for match in re.finditer(state_pattern, content, re.MULTILINE):
-            states.add(match.group(1))
-        
-        # Extract initial state
-        initial_pattern = r'I\s+->\s+(\d+)'
+        for m in re.finditer(state_pattern, content, re.MULTILINE):
+            states.add(m.group(1))
+
+        # Initial state (I -> s)
+        initial_pattern = r'I\s*->\s*(\d+)'
         initial_match = re.search(initial_pattern, content)
         initial_state = initial_match.group(1) if initial_match else '0'
-        
-        # Extract transitions
+
+        # Transitions: label may contain "\n{acc-sets}"
         transitions = defaultdict(list)
-        # Pattern for transitions (handles acceptance marks)
-        trans_pattern = r'^\s*(\d+)\s+->\s+(\d+)\s+\[label="([^"]+)"[^\]]*\]'
-        
-        for match in re.finditer(trans_pattern, content, re.MULTILINE):
-            from_state = match.group(1)
-            to_state = match.group(2)
-            # Remove acceptance marks like \n{0} or \n{1}
-            condition = match.group(3).split('\n')[0].strip()
+        trans_pattern = r'^\s*(\d+)\s*->\s*(\d+)\s*\[label="([^"]+)"[^\]]*\]'
+        acc_re = re.compile(r'\{([^}]*)\}')
+
+        for m in re.finditer(trans_pattern, content, re.MULTILINE):
+            frm, to, label = m.group(1), m.group(2), m.group(3)
+
+            cond_part, acc_part = label, ''
+            if '\\n' in label:
+                cond_part, acc_part = label.split('\\n', 1)
+            elif '\n' in label:
+                cond_part, acc_part = label.split('\n', 1)
+
+            # Handle Mealy machine syntax: "input_condition / output_condition"
+            if '/' in cond_part:
+                input_cond, output_cond = cond_part.split('/', 1)
+                input_cond = input_cond.strip()
+                output_cond = output_cond.strip()
+            else:
+                input_cond = cond_part.strip()
+                output_cond = None
             
-            transitions[from_state].append({
-                'to': to_state,
-                'condition': condition
+            acc_sets = []
+            acc_m = acc_re.search(acc_part or '')
+            if acc_m:
+                raw = acc_m.group(1).strip()
+                if raw:
+                    acc_sets = [int(x.strip()) for x in raw.split(',') if x.strip().isdigit()]
+
+            transitions[frm].append({
+                'to': to, 
+                'condition': input_cond, 
+                'output_condition': output_cond,
+                'acc': acc_sets
             })
-        
+
         return {
             'states': sorted(list(states)),
             'initial': initial_state,
             'transitions': dict(transitions)
         }
-    
-    def _extract_propositions(self):
+
+    def _extract_propositions(self) -> List[str]:
         """Extract atomic propositions from transition conditions."""
         props = set()
         for trans_list in self.automaton['transitions'].values():
             for trans in trans_list:
-                # Remove operators and parentheses
-                cleaned = re.sub(r'[&|!()]', ' ', trans['condition'])
-                # Find all proposition names
-                found = re.findall(r'\b([a-zA-Z][a-zA-Z0-9]*)\b', cleaned)
+                # Extract from input condition
+                cleaned = re.sub(r'[&|!() ]', ' ', trans['condition'])
+                found = re.findall(r'\b([A-Za-z_][A-Za-z0-9_]*)\b', cleaned)
                 props.update(found)
-        return sorted(list(props))
-    
-    def _generate_alphabet(self):
-        """Generate alphabet as binary encodings of proposition valuations."""
-        n = len(self.propositions)
-        if n > 10:  # Warn if alphabet is very large
-            print(f"Warning: {2**n} symbols in alphabet (may be slow)")
-        
+                
+                # Extract from output condition if present
+                if trans.get('output_condition'):
+                    cleaned_out = re.sub(r'[&|!() ]', ' ', trans['output_condition'])
+                    found_out = re.findall(r'\b([A-Za-z_][A-Za-z0-9_]*)\b', cleaned_out)
+                    props.update(found_out)
+        return sorted(props)
+
+    def _generate_input_alphabet(self) -> List[str]:
+        """Generate input alphabet as binary encodings of input proposition valuations."""
+        n = len(self.input_props)
+        if n > 12:
+            print(f"Warning: input alphabet has {2**n} symbols (may be slow)")
         alphabet = []
         for values in product([False, True], repeat=n):
-            # Create binary string representation
             symbol = ''.join('1' if v else '0' for v in values)
             alphabet.append(symbol)
         return alphabet
-    
-    def _build_transition_map(self):
-        """Pre-compute transition map for all state-input pairs."""
+
+    def _build_transition_map(self) -> Dict[tuple, tuple]:
+        """Pre-compute transition map for all state-input pairs, returning (next_state, output)."""
         trans_map = {}
-        
         for state in self.automaton['states']:
             for symbol in self.alphabet:
-                # Find which transition matches this input
-                valuation = self._symbol_to_valuation(symbol)
-                next_state = self._find_next_state(state, valuation)
-                trans_map[(state, symbol)] = next_state
-        
+                input_valuation = self._input_symbol_to_valuation(symbol)
+                # Find all valid complete valuations and their destinations
+                valid_transitions = self._find_valid_transitions(state, input_valuation)
+                if valid_transitions:
+                    # Take the first valid transition (automaton should be deterministic)
+                    next_state, output_valuation = valid_transitions[0]
+                    output_symbol = self._output_valuation_to_symbol(output_valuation)
+                    trans_map[(state, symbol)] = (next_state, output_symbol)
+                else:
+                    # No valid transition, stay in current state with default output
+                    default_output = '0' * len(self.output_props)
+                    trans_map[(state, symbol)] = (state, default_output)
         return trans_map
-    
-    def _symbol_to_valuation(self, symbol):
-        """Convert binary string to proposition valuation."""
-        return {prop: symbol[i] == '1' 
-                for i, prop in enumerate(self.propositions)}
-    
-    def _evaluate_condition(self, condition, valuation):
+
+    def _input_symbol_to_valuation(self, symbol: str) -> Dict[str, bool]:
+        """Convert input binary string to input proposition valuation."""
+        return {prop: (symbol[i] == '1') for i, prop in enumerate(self.input_props)}
+
+    def _output_valuation_to_symbol(self, valuation: Dict[str, bool]) -> str:
+        """Convert output proposition valuation to binary string."""
+        return ''.join('1' if valuation.get(prop, False) else '0' for prop in self.output_props)
+
+    def _find_valid_transitions(self, state: str, input_valuation: Dict[str, bool]) -> List[tuple]:
+        """Find all valid transitions from state with given input, checking output conditions."""
+        valid = []
+        
+        for trans in self.automaton['transitions'].get(state, []):
+            # Check if input condition matches
+            if self._evaluate_condition(trans['condition'], input_valuation):
+                if trans.get('output_condition'):
+                    # Parse output condition to determine required output values
+                    output_valuation = self._parse_output_condition(trans['output_condition'])
+                    if output_valuation is not None:
+                        valid.append((trans['to'], output_valuation))
+                else:
+                    # No output condition specified, use default
+                    default_output = {prop: False for prop in self.output_props}
+                    valid.append((trans['to'], default_output))
+        
+        return valid
+
+    def _parse_output_condition(self, output_cond: str) -> Optional[Dict[str, bool]]:
+        """Parse output condition string to extract required output values."""
+        if not output_cond or output_cond.strip() == '':
+            return None
+        
+        # Try to evaluate output condition for each possible output combination
+        for output_values in product([False, True], repeat=len(self.output_props)):
+            output_valuation = {prop: val for prop, val in zip(self.output_props, output_values)}
+            if self._evaluate_condition(output_cond, output_valuation):
+                return output_valuation
+        
+        return None
+
+    def _evaluate_condition(self, condition: str, valuation: Dict[str, bool]) -> bool:
         """Evaluate boolean condition with given valuation."""
         expr = condition
-        
-        # Replace each proposition with its truth value
+
+        # Replace AP names with True/False
         for prop, value in valuation.items():
-            # Use word boundaries to avoid partial matches
-            expr = re.sub(r'\b' + prop + r'\b', str(value), expr)
-        
-        # Convert to Python boolean operators
-        expr = expr.replace('&', ' and ')
-        expr = expr.replace('|', ' or ')
-        expr = expr.replace('!', ' not ')
-        
+            expr = re.sub(r'\b' + re.escape(prop) + r'\b', 'True' if value else 'False', expr)
+
+        # Handle 1/0 constants cleanly
+        expr = re.sub(r'(?<![A-Za-z0-9_])1(?![A-Za-z0-9_])', 'True', expr)
+        expr = re.sub(r'(?<![A-Za-z0-9_])0(?![A-Za-z0-9_])', 'False', expr)
+
+        # Convert operators
+        expr = expr.replace('&', ' and ').replace('|', ' or ').replace('!', ' not ')
+
         try:
-            return eval(expr)
-        except:
+            return bool(eval(expr))
+        except Exception:
             print(f"Error evaluating: {condition} with {valuation}")
             return False
-    
-    def _find_next_state(self, state, valuation):
-        """Find next state given current state and input valuation."""
-        transitions = self.automaton['transitions'].get(state, [])
-        
-        for trans in transitions:
-            if self._evaluate_condition(trans['condition'], valuation):
-                return trans['to']
-        
-        # If no transition matches, stay in current state (or could go to error)
-        return state
-    
-    def step(self, letter):
-        """Execute one step of the automaton (AALpy interface)."""
+
+    # --- AALpy SUL interface ---
+
+    def step(self, letter: str) -> str:
         if letter not in self.alphabet:
             raise ValueError(f"Invalid input: {letter}")
-        
-        # Use precomputed transition map
-        next_state = self.transition_map.get((self.current_state, letter), self.current_state)
+        next_state, output = self.transition_map.get((self.current_state, letter), (self.current_state, '0' * len(self.output_props)))
         self.current_state = next_state
-        
-        # Return state as output (for Mealy machine interpretation)
-        return next_state
-    
+        return output  # return output symbol instead of state
+
     def reset(self):
-        """Reset to initial state (AALpy interface)."""
         self.current_state = self.automaton['initial']
-    
+
     def pre(self):
-        """Called before learning (AALpy interface)."""
         self.reset()
-    
+
     def post(self):
-        """Called after learning (AALpy interface)."""
         pass
 
 
-def learn_automaton_from_spot(dot_file, 
-                              learning_algorithm='lstar',
-                              eq_oracle_type='random_walk',
-                              max_rounds=100):
-    """
-    Main function to learn an automaton using SPOT automaton as oracle.
-    
-    Args:
-        dot_file: Path to SPOT-generated DOT file
-        learning_algorithm: 'lstar' or 'kv'
-        eq_oracle_type: 'random_walk' or 'w_method'
-        max_rounds: Maximum learning rounds
-    
-    Returns:
-        Learned AALpy automaton
-    """
-    # Create oracle from SPOT automaton
-    oracle = SpotAutomatonOracle(dot_file)
-    
-    # Warn about alphabet size
+# -------------------------------
+# Learning + Evaluation
+# -------------------------------
+
+def learn_automaton_from_spot(dot_file: str,
+                              input_props: List[str],
+                              output_props: List[str],
+                              learning_algorithm: str = 'lstar',
+                              eq_oracle_type: str = 'random_walk',
+                              max_rounds: int = 100):
+    """Learn Mealy using oracle constructed from SPOT DOT."""
+    oracle = SpotAutomatonOracle(dot_file, input_props, output_props)
+
     if len(oracle.alphabet) > 8 and eq_oracle_type == 'w_method':
         print(f"WARNING: W-method with {len(oracle.alphabet)} symbols may be very slow!")
         print("Consider using 'random_walk' instead.")
-    
-    # Setup equivalence oracle
+
+    # Equivalence oracle
     if eq_oracle_type == 'random_walk':
-        # Scale parameters based on problem size
         num_steps = min(50000, len(oracle.alphabet) * 5000)
-        
-        from aalpy.oracles import RandomWalkEqOracle
         eq_oracle = RandomWalkEqOracle(
             alphabet=oracle.alphabet,
             sul=oracle,
             num_steps=num_steps,
             reset_prob=0.09,
-            reset_after_cex=True  # Reset after finding counterexample
+            reset_after_cex=True
         )
         print(f"Using RandomWalk with {num_steps} steps")
-        
     elif eq_oracle_type == 'w_method':
-        from aalpy.oracles import WMethodEqOracle
-        # Limit depth for large alphabets
         max_states = len(oracle.automaton['states']) * 2
         if len(oracle.alphabet) > 8:
             max_states = min(max_states, 6)
-            
         eq_oracle = WMethodEqOracle(
             alphabet=oracle.alphabet,
             sul=oracle,
@@ -228,12 +281,10 @@ def learn_automaton_from_spot(dot_file,
         print(f"Using W-method with max_states={max_states}")
     else:
         raise ValueError(f"Unknown equivalence oracle type: {eq_oracle_type}")
-    
-    # Run learning algorithm
+
+    # Learning
     print(f"\nStarting {learning_algorithm.upper()} learning with {eq_oracle_type} equivalence oracle...")
-    
     if learning_algorithm == 'lstar':
-        from aalpy.learning_algs import run_Lstar
         learned = run_Lstar(
             alphabet=oracle.alphabet,
             sul=oracle,
@@ -241,7 +292,7 @@ def learn_automaton_from_spot(dot_file,
             automaton_type='mealy',
             max_learning_rounds=max_rounds,
             print_level=2,
-            cache_and_non_det_check=True  # Enable caching
+            cache_and_non_det_check=True
         )
     elif learning_algorithm == 'kv':
         from aalpy.learning_algs import run_KV
@@ -255,116 +306,314 @@ def learn_automaton_from_spot(dot_file,
         )
     else:
         raise ValueError(f"Unknown learning algorithm: {learning_algorithm}")
-    
-    # Check if learning was complete
+
     if len(learned.states) < len(oracle.automaton['states']):
-        print(f"\nWARNING: Learned only {len(learned.states)} states out of {len(oracle.automaton['states'])} oracle states.")
-        print("The equivalence oracle may not have found all counterexamples.")
-        print("Try: 1) Increasing num_steps for random_walk")
-        print("     2) Using w_method for complete checking (if alphabet is small)")
-        print("     3) Running learning multiple times")
-    
+        print(f"\nWARNING: Learned {len(learned.states)} < oracle {len(oracle.automaton['states'])} states.")
+        print("Try: increase random_walk steps, or use w_method if alphabet is small.")
+
     return learned, oracle
 
 
-def compare_automata(learned, oracle):
-    """Compare learned automaton with oracle on test sequences."""
+def compare_automata(learned, oracle: SpotAutomatonOracle, num_tests: int = 1000, max_length: int = 20) -> float:
+    """Quick randomized comparison of learned vs oracle outputs."""
     import random
-    
+
     print("\n=== Comparing Learned vs Oracle ===")
-    
-    # Generate test sequences
-    num_tests = 1000
-    max_length = 20
     mismatches = 0
     example_mismatches = []
-    
+
     for _ in range(num_tests):
-        # Generate random sequence
         length = random.randint(1, max_length)
         sequence = [random.choice(oracle.alphabet) for _ in range(length)]
-        
-        # Execute on oracle
+
+        # Oracle run
         oracle.reset()
-        oracle_outputs = []
-        for symbol in sequence:
-            output = oracle.step(symbol)
-            oracle_outputs.append(output)
-        
-        # Execute on learned automaton (direct traversal)
+        oracle_outputs = [oracle.step(sym) for sym in sequence]
+
+        # Learned run
         learned_outputs = []
         current_state = learned.initial_state
-        for symbol in sequence:
-            if symbol in current_state.transitions:
-                next_state = current_state.transitions[symbol]
-                # For Mealy machines, get output from output_fun
-                if hasattr(current_state, 'output_fun') and symbol in current_state.output_fun:
-                    output = current_state.output_fun[symbol]
+        for sym in sequence:
+            if sym in current_state.transitions:
+                nxt = current_state.transitions[sym]
+                # Mealy output: use output_fun
+                if hasattr(current_state, 'output_fun') and sym in current_state.output_fun:
+                    out = current_state.output_fun[sym]
                 else:
-                    output = next_state.state_id
-                learned_outputs.append(output)
-                current_state = next_state
+                    out = None
+                learned_outputs.append(out)
+                current_state = nxt
             else:
-                # No transition defined - this shouldn't happen if learning was complete
                 learned_outputs.append(None)
                 break
-        
-        # Compare
+
         if oracle_outputs != learned_outputs:
             mismatches += 1
-            if len(example_mismatches) < 3:  # Store first few mismatches
+            if len(example_mismatches) < 3:
                 example_mismatches.append({
                     'sequence': sequence[:5],
                     'oracle': oracle_outputs[:5],
                     'learned': learned_outputs[:5]
                 })
-    
-    # Show example mismatches
+
     if example_mismatches:
         print("Example mismatches:")
         for ex in example_mismatches:
             print(f"  Seq {ex['sequence']}... Oracle: {ex['oracle']}..., Learned: {ex['learned']}...")
-    
+
     accuracy = (num_tests - mismatches) / num_tests * 100
     print(f"Accuracy: {accuracy:.2f}% ({num_tests - mismatches}/{num_tests} sequences match)")
-    
     return accuracy
 
 
+# -------------------------------
+# HOA Exporters
+# -------------------------------
+
+def _cond_to_hoa(condition: str, propositions: List[str], use_indices: bool = True) -> str:
+    """
+    Convert a SPOT-style boolean condition over named APs into HOA label syntax.
+    - If use_indices=True, map AP names to numeric indices 0..n-1 (Spot prefers this).
+    - Keep !, &, |, ( ), and constants t/f.
+    """
+    if not condition or condition.strip() == '':
+        return 't'
+    s = condition.strip()
+    # constants
+    s = re.sub(r'(?<![A-Za-z0-9_])1(?![A-Za-z0-9_])', 't', s)
+    s = re.sub(r'(?<![A-Za-z0-9_])0(?![A-Za-z0-9_])', 'f', s)
+    if use_indices:
+        for i, p in enumerate(propositions):
+            s = re.sub(r'\b' + re.escape(p) + r'\b', str(i), s)
+    return s
+
+def export_spot_oracle_to_hoa(oracle: SpotAutomatonOracle, out_path: str):
+    """
+    Export the parsed SPOT automaton (transition-based acceptance) to HOA v1.
+    Preserves acceptance sets found on transitions. Uses numeric AP indices.
+    """
+    auto = oracle.automaton
+    props = oracle.propositions
+    states = auto['states']
+    start = auto['initial']
+
+    # Identify how many acceptance sets are used
+    used_sets = set()
+    for trans_list in auto['transitions'].values():
+        for t in trans_list:
+            used_sets.update(t.get('acc', []))
+    max_set = max(used_sets) if used_sets else -1
+    n_sets = max_set + 1 if used_sets else 0
+
+    lines = []
+    lines.append('HOA: v1')
+    lines.append(f'name: "{os.path.basename(out_path)}"')
+    lines.append(f'States: {len(states)}')
+    lines.append(f'Start: {start}')
+    if props:
+        ap_names = ' '.join(f'"{p}"' for p in props)
+        lines.append(f'AP: {len(props)} {ap_names}')
+    else:
+        lines.append('AP: 0')
+
+    # Acceptance
+    if n_sets == 0:
+        lines.append('Acceptance: 0 t')
+    elif n_sets == 1 and used_sets == {0}:
+        lines.append('acc-name: Buchi')
+        lines.append('Acceptance: 1 Inf(0)')
+    else:
+        lines.append(f'acc-name: generalized-Buchi {n_sets}')
+        conj = ' & '.join(f'Inf({i})' for i in range(n_sets))
+        lines.append(f'Acceptance: {n_sets} {conj}')
+
+    lines.append('properties: trans-labels explicit-labels')
+    lines.append('--BODY--')
+
+    for s in states:
+        lines.append(f'State: {s}')
+        for t in auto['transitions'].get(s, []):
+            # For oracle HOA, reconstruct full condition including outputs if present
+            if t.get('output_condition'):
+                full_cond = f"{t['condition']} / {t['output_condition']}"
+            else:
+                full_cond = t['condition']
+            cond = _cond_to_hoa(full_cond, props, use_indices=True)
+            to = t['to']
+            acc = t.get('acc', [])
+            acc_brace = f" {{{','.join(map(str, acc))}}}" if acc else ''
+            lines.append(f'[{cond}] {to}{acc_brace}')
+
+    lines.append('--END--')
+
+    with open(out_path, 'w') as f:
+        f.write('\n'.join(lines))
+
+    print(f'Oracle HOA saved to: {out_path}')
+
+def export_learned_mealy_to_hoa(
+    learned,
+    alphabet: List[str],
+    input_props: List[str],
+    output_props: List[str],
+    out_path: str,
+    *,
+    merge_by_destination: bool = True,
+    label_as_indices: bool = True,
+    require_deterministic: bool = True
+):
+    """
+    Export learned Mealy to HOA with both inputs and outputs as atomic propositions.
+    The transition labels will include both input conditions and output values.
+    """
+    # Include both inputs and outputs as APs
+    all_props = input_props + output_props
+    
+    # Stable mapping state -> id
+    state_list = list(learned.states)
+    id_map = {st: i for i, st in enumerate(state_list)}
+
+    def make_transition_label(input_letter: str, output: str) -> str:
+        """Create a label that includes both input condition and output values."""
+        terms = []
+        
+        # Add input conditions
+        for i, b in enumerate(input_letter):
+            if i < len(input_props):
+                if label_as_indices:
+                    lit = (str(i) if b == '1' else f'!{i}')
+                else:
+                    name = input_props[i]
+                    lit = (name if b == '1' else f'!{name}')
+                terms.append(lit)
+        
+        # Add output conditions
+        for i, b in enumerate(output):
+            if i < len(output_props):
+                prop_idx = len(input_props) + i  # offset by number of input props
+                if label_as_indices:
+                    lit = (str(prop_idx) if b == '1' else f'!{prop_idx}')
+                else:
+                    name = output_props[i]
+                    lit = (name if b == '1' else f'!{name}')
+                terms.append(lit)
+        
+        return '&'.join(terms) if terms else 't'
+
+    # HOA header
+    lines = []
+    lines.append('HOA: v1')
+    lines.append(f'name: "{os.path.basename(out_path)}"')
+    lines.append(f'States: {len(state_list)}')
+    lines.append(f'Start: {id_map[learned.initial_state]}')
+    if all_props:
+        ap_names = ' '.join(f'"{p}"' for p in all_props)
+        lines.append(f'AP: {len(all_props)} {ap_names}')
+    else:
+        lines.append('AP: 0')
+    lines.append('Acceptance: 0 t')
+    lines.append('properties: trans-labels explicit-labels deterministic')
+    lines.append('--BODY--')
+
+    for st in state_list:
+        sid = id_map[st]
+        lines.append(f'State: {sid}')
+
+        if merge_by_destination:
+            dest_to_labels: Dict[int, List[str]] = {}
+            for input_letter, nxt in st.transitions.items():
+                # Get the output for this transition
+                output = st.output_fun.get(input_letter, '0' * len(output_props)) if hasattr(st, 'output_fun') else '0' * len(output_props)
+                lbl = make_transition_label(input_letter, output)
+                dest_to_labels.setdefault(id_map[nxt], []).append(lbl)
+
+            for dest, lbls in dest_to_labels.items():
+                uniq = sorted(set(lbls))
+                label = uniq[0] if len(uniq) == 1 else " | ".join(uniq)
+                lines.append(f'[{label}] {dest}')
+        else:
+            seen_pairs = set()
+            for input_letter, nxt in st.transitions.items():
+                output = st.output_fun.get(input_letter, '0' * len(output_props)) if hasattr(st, 'output_fun') else '0' * len(output_props)
+                lbl = make_transition_label(input_letter, output)
+                key = (lbl, id_map[nxt])
+                if key in seen_pairs:
+                    continue
+                seen_pairs.add(key)
+                lines.append(f'[{lbl}] {id_map[nxt]}')
+
+    lines.append('--END--')
+
+    with open(out_path, 'w') as f:
+        f.write('\n'.join(lines))
+
+    print(f'Learned HOA saved to: {out_path}')
+
+
+# -------------------------------
+# CLI + Main
+# -------------------------------
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='Convert SPOT automata to AALpy and learn Mealy machines')
+    parser.add_argument('dot_file', help='Input DOT file from SPOT')
+    parser.add_argument('--inputs', help='Comma-separated input propositions (e.g., a,b)', required=True)
+    parser.add_argument('--outputs', help='Comma-separated output propositions (e.g., p0,p1)', required=True)
+    parser.add_argument('--algorithm', default='lstar', choices=['lstar', 'kv'],
+                        help='Learning algorithm (default: lstar)')
+    parser.add_argument('--eq', '--eq_oracle', default='random_walk', choices=['random_walk', 'w_method'],
+                        help='Equivalence oracle (default: random_walk)')
+    return parser.parse_args()
+
 def main():
-    """Main entry point."""
-    if len(sys.argv) < 2:
-        print("Usage: python spot_to_aalpy.py <dot_file> [algorithm] [eq_oracle]")
-        print("  algorithm: lstar (default) or kv")
-        print("  eq_oracle: random_walk (default) or w_method")
-        sys.exit(1)
+    args = parse_args()
     
-    dot_file = sys.argv[1]
-    algorithm = sys.argv[2] if len(sys.argv) > 2 else 'lstar'
-    eq_oracle = sys.argv[3] if len(sys.argv) > 3 else 'random_walk'
+    input_props = [p.strip() for p in args.inputs.split(',')]
+    output_props = [p.strip() for p in args.outputs.split(',')]
     
+    print(f"Input propositions: {input_props}")
+    print(f"Output propositions: {output_props}")
+
     # Learn automaton
-    learned, oracle = learn_automaton_from_spot(dot_file, algorithm, eq_oracle)
-    
-    # Print results
+    learned, oracle = learn_automaton_from_spot(
+        args.dot_file, input_props, output_props, args.algorithm, args.eq
+    )
+
     print(f"\n=== Learning Complete ===")
     print(f"Oracle states: {len(oracle.automaton['states'])}")
     print(f"Learned states: {len(learned.states)}")
-    
-    # Save learned automaton
-    output_file = dot_file.replace('.dot', '_learned.dot')
-    save_automaton_to_file(learned, output_file)
-    print(f"Learned automaton saved to: {output_file}")
-    
-    # Optional: Compare accuracy
-    if len(oracle.automaton['states']) <= 10:  # Only for small automata
+
+    # Save learned automaton (DOT)
+    learned_dot = args.dot_file.replace('.dot', '_learned.dot')
+    save_automaton_to_file(learned, learned_dot)
+    print(f"Learned automaton saved to: {learned_dot}")
+
+    # Save oracle HOA next to the input DOT (preserves acceptance, numeric labels)
+    oracle_hoa = args.dot_file.replace('.dot', '.hoa')
+    export_spot_oracle_to_hoa(oracle, oracle_hoa)
+
+    # Save learned HOA
+    learned_hoa = args.dot_file.replace('.dot', '_learned.hoa')
+    export_learned_mealy_to_hoa(
+        learned,
+        oracle.alphabet,
+        input_props,
+        output_props,
+        learned_hoa,
+        merge_by_destination=True,
+        label_as_indices=True,
+        require_deterministic=True
+    )
+
+    # Optional: Compare accuracy on random tests for small machines
+    if len(oracle.automaton['states']) <= 10:
         compare_automata(learned, oracle)
-    
+
     # Optional: Visualize (requires graphviz)
     try:
-        visualize_automaton(learned, path=output_file.replace('.dot', ''))
-        print(f"Visualization saved to: {output_file.replace('.dot', '.pdf')}")
-    except:
+        visualize_automaton(learned, path=learned_dot.replace('.dot', ''))
+        print(f"Visualization saved to: {learned_dot.replace('.dot', '.pdf')}")
+    except Exception:
         print("Visualization skipped (install graphviz to enable)")
 
 
