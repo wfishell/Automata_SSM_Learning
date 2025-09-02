@@ -128,7 +128,7 @@ def ActiveLearning(tlsf_file):
                shell=True, check=True)
 
 if __name__=='__main__':
-    tlsf = '/Users/will/github/Automata_SSM_Learning/TestSet/SyntCompBenchMarks/Test10.tlsf'
+    tlsf = '/Users/will/github/Automata_SSM_Learning/TestSet/SyntCompBenchMarks/Test1.tlsf'
     # 1) Build controller.* (ensure GenerateDotAndHoa.py is NOT duplicated)
     DotAndHoa(tlsf)
     print('Construct master hoa and dot files representing true system behavior')
