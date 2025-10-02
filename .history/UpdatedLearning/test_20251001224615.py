@@ -1,22 +1,30 @@
 #!/usr/bin/env python3
+import argparse
 import json
 import random
-import argparse
+
 import networkx as nx
 import pydot
+
 
 def load_json(path):
     with open(path) as f:
         data = json.load(f)
     return data
 
+
 import pydot
+
 
 def load_dot(path):
     graphs = pydot.graph_from_dot_file(path)
     graph = graphs[0]
 
-    states = [n.get_name().strip('"') for n in graph.get_nodes() if n.get_name() not in ('node','I')]
+    states = [
+        n.get_name().strip('"')
+        for n in graph.get_nodes()
+        if n.get_name() not in ("node", "I")
+    ]
     # find initial state via I -> X edge
     init_edges = [e for e in graph.get_edges() if e.get_source() == "I"]
     initial = init_edges[0].get_destination().strip('"') if init_edges else states[0]
@@ -42,8 +50,9 @@ def load_dot(path):
         "states": states,
         "initial": initial,
         "alphabet": sorted(alphabet),
-        "transitions": transitions
+        "transitions": transitions,
     }
+
 
 def generate_trace(machine, length=10, cycle=False):
     state = machine["initial"]
@@ -66,9 +75,13 @@ def generate_trace(machine, length=10, cycle=False):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Random trace generator for deterministic Mealy machines.")
+    parser = argparse.ArgumentParser(
+        description="Random trace generator for deterministic Mealy machines."
+    )
     parser.add_argument("file", help="Path to automaton (JSON or DOT).")
-    parser.add_argument("--fmt", choices=["json","dot"], required=True, help="File format")
+    parser.add_argument(
+        "--fmt", choices=["json", "dot"], required=True, help="File format"
+    )
     parser.add_argument("-n", "--num", type=int, default=5, help="Number of traces")
     parser.add_argument("-l", "--length", type=int, default=10, help="Trace length")
     parser.add_argument("--cycle", action="store_true", help="Append cycle{1} at end")
@@ -81,6 +94,7 @@ def main():
 
     for i in range(args.num):
         print(generate_trace(machine, length=args.length, cycle=args.cycle))
+
 
 if __name__ == "__main__":
     main()

@@ -1,11 +1,14 @@
+import argparse
 import sys
 from pathlib import Path
 from typing import List, Tuple
+
 from aalpy.learning_algs.deterministic_passive.RPNI import run_RPNI
-import argparse
 
 
-def parse_step(step: str, inputs: List[str], outputs: List[str]) -> Tuple[Tuple[int, ...], Tuple[int, ...]]:
+def parse_step(
+    step: str, inputs: List[str], outputs: List[str]
+) -> Tuple[Tuple[int, ...], Tuple[int, ...]]:
     atoms = step.split("&")
     valuation = {}
     for atom in atoms:
@@ -30,7 +33,7 @@ def parse_trace(line: str, inputs: List[str], outputs: List[str]):
 def make_prefix_closed(trace):
     dataset = []
     input_prefix = []
-    for (inp, out) in trace:
+    for inp, out in trace:
         input_prefix = input_prefix + [inp]
         dataset.append((tuple(input_prefix), out))
     return dataset
@@ -49,7 +52,9 @@ def process_file(trace_file: str, inputs: List[str], outputs: List[str]):
     return dataset
 
 
-def save_mealy_as_hoa(mealy, inputs: List[str], outputs: List[str], filename="learned_mealy.hoa"):
+def save_mealy_as_hoa(
+    mealy, inputs: List[str], outputs: List[str], filename="learned_mealy.hoa"
+):
     aps = inputs + outputs
     ap_indices = {ap: i for i, ap in enumerate(aps)}
 
@@ -60,11 +65,13 @@ def save_mealy_as_hoa(mealy, inputs: List[str], outputs: List[str], filename="le
         f.write("HOA: v1\n")
         f.write(f"States: {len(states)}\n")
         f.write(f"Start: {state_ids[mealy.initial_state]}\n")
-        f.write(f"AP: {len(aps)} " + " ".join(f"\"{ap}\"" for ap in aps) + "\n")
+        f.write(f"AP: {len(aps)} " + " ".join(f'"{ap}"' for ap in aps) + "\n")
         f.write("acc-name: all\n")
         f.write("Acceptance: 0 t\n")
         f.write("properties: trans-labels explicit-labels state-acc deterministic\n")
-        f.write("controllable-AP: " + " ".join(str(ap_indices[o]) for o in outputs) + "\n")
+        f.write(
+            "controllable-AP: " + " ".join(str(ap_indices[o]) for o in outputs) + "\n"
+        )
         f.write("--BODY--\n")
 
         for s in states:
@@ -90,10 +97,16 @@ def save_mealy_as_hoa(mealy, inputs: List[str], outputs: List[str], filename="le
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Convert traces to Mealy machine and export as HOA.")
+    parser = argparse.ArgumentParser(
+        description="Convert traces to Mealy machine and export as HOA."
+    )
     parser.add_argument("trace_file", help="Path to trace file")
-    parser.add_argument("--ins", required=True, help="Comma-separated list of input APs")
-    parser.add_argument("--outs", required=True, help="Comma-separated list of output APs")
+    parser.add_argument(
+        "--ins", required=True, help="Comma-separated list of input APs"
+    )
+    parser.add_argument(
+        "--outs", required=True, help="Comma-separated list of output APs"
+    )
 
     args = parser.parse_args()
 

@@ -1,46 +1,77 @@
 import os
 import subprocess
+
 import pandas as pd
 
-def SynthesizeMealy(file_path):
-    inputs = subprocess.run(
-        ["syfco", "--print-input-signals", file_path],
-        capture_output=True, text=True, check=True
-    ).stdout.replace(" ", "").strip()
 
-    outputs = subprocess.run(
-        ["syfco", "--print-output-signals", file_path],
-        capture_output=True, text=True, check=True
-    ).stdout.replace(" ", "").strip()
+def SynthesizeMealy(file_path):
+    inputs = (
+        subprocess.run(
+            ["syfco", "--print-input-signals", file_path],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        .stdout.replace(" ", "")
+        .strip()
+    )
+
+    outputs = (
+        subprocess.run(
+            ["syfco", "--print-output-signals", file_path],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        .stdout.replace(" ", "")
+        .strip()
+    )
 
     APs = ",".join([inputs, outputs]) if outputs else inputs
 
-    subprocess.run(f"ltlsynt --hide-status --tlsf {file_path} > System.hoa",
-                   shell=True, check=True)
-    subprocess.run(f"ltlsynt --hide-status --tlsf {file_path} --dot > System.dot",
-                   shell=True, check=True)
+    subprocess.run(
+        f"ltlsynt --hide-status --tlsf {file_path} > System.hoa", shell=True, check=True
+    )
+    subprocess.run(
+        f"ltlsynt --hide-status --tlsf {file_path} --dot > System.dot",
+        shell=True,
+        check=True,
+    )
 
     return APs, inputs, outputs
 
 
-def GenerateTraces(dot_file, aps, num_traces=100, trace_length=10, output_file="Training_Dataset.txt"):
-    subprocess.run([
-        "python", "Dot_Trace_Generator.py",
-        dot_file,
-        "--fmt", "dot",
-        "--aps", aps,
-        "-n", str(num_traces),
-        "-l", str(trace_length),
-        "--cycle",
-        "--out", output_file
-    ], check=True)
+def GenerateTraces(
+    dot_file, aps, num_traces=100, trace_length=10, output_file="Training_Dataset.txt"
+):
+    subprocess.run(
+        [
+            "python",
+            "Dot_Trace_Generator.py",
+            dot_file,
+            "--fmt",
+            "dot",
+            "--aps",
+            aps,
+            "-n",
+            str(num_traces),
+            "-l",
+            str(trace_length),
+            "--cycle",
+            "--out",
+            output_file,
+        ],
+        check=True,
+    )
 
 
 def CheckTraces(hoa_file, data_file):
     """Run Trace_Checker and parse acceptance percentage from stdout."""
     result = subprocess.run(
         ["python", "Trace_Checker.py", hoa_file, data_file],
-        capture_output=True, text=True, check=True
+        capture_output=True,
+        text=True,
+        check=True,
     )
     # Look for the line with "Acceptance %:"
     acc = None
@@ -51,13 +82,14 @@ def CheckTraces(hoa_file, data_file):
 
 
 def PassiveLearning(data_file, inputs, outputs):
-    subprocess.run([
-        "python", "Passive_Mealy_Learning.py", data_file, inputs, outputs
-    ], check=True)
+    subprocess.run(
+        ["python", "Passive_Mealy_Learning.py", data_file, inputs, outputs], check=True
+    )
 
     subprocess.run(
         "autfilt Training_Dataset.hoa --dot > Training_Dataset.dot",
-        shell=True, check=True
+        shell=True,
+        check=True,
     )
 
 
@@ -83,8 +115,8 @@ if __name__ == "__main__":
     directory = "/Users/will/github/Automata_SSM_Learning/TestSet/SyntCompBenchMarks/"
 
     # sweep settings
-    trace_lengths = [10]                     # keep length fixed
-    trace_counts = [5, 10, 20, 50, 100]      # vary num_traces
+    trace_lengths = [10]  # keep length fixed
+    trace_counts = [5, 10, 20, 50, 100]  # vary num_traces
 
     csv_path = "pipeline_results.csv"
 
@@ -92,7 +124,9 @@ if __name__ == "__main__":
     if os.path.exists(csv_path):
         df = pd.read_csv(csv_path)
     else:
-        df = pd.DataFrame(columns=["file", "num_traces", "length", "samples", "accuracy"])
+        df = pd.DataFrame(
+            columns=["file", "num_traces", "length", "samples", "accuracy"]
+        )
 
     all_results = []
 
@@ -109,16 +143,20 @@ if __name__ == "__main__":
                     continue
 
                 full_path = os.path.join(directory, file)
-                print(f"\n[+] Running pipeline for {full_path} with {num_traces} traces, length {length}")
+                print(
+                    f"\n[+] Running pipeline for {full_path} with {num_traces} traces, length {length}"
+                )
                 acc = PassivePipeline(full_path, num_traces, length)
 
-                all_results.append({
-                    "file": file,
-                    "num_traces": num_traces,
-                    "length": length,
-                    "samples": samples,
-                    "accuracy": acc
-                })
+                all_results.append(
+                    {
+                        "file": file,
+                        "num_traces": num_traces,
+                        "length": length,
+                        "samples": samples,
+                        "accuracy": acc,
+                    }
+                )
 
     # Merge new results with old
     if all_results:
@@ -129,9 +167,9 @@ if __name__ == "__main__":
 
     # Group by file and samples, compute average accuracy
 summary = (
-    df.groupby(['file', 'samples'], as_index=False)['accuracy']
-      .mean()
-      .rename(columns={'accuracy': 'average_accuracy'})
+    df.groupby(["file", "samples"], as_index=False)["accuracy"]
+    .mean()
+    .rename(columns={"accuracy": "average_accuracy"})
 )
 
 # Save to CSV

@@ -1,20 +1,27 @@
 #!/usr/bin/env python3
+import argparse
 import json
 import random
-import argparse
-import pydot
 import re
+
+import pydot
+
 
 def load_json(path):
     with open(path) as f:
         data = json.load(f)
     return data
 
+
 def load_dot(path):
     graphs = pydot.graph_from_dot_file(path)
     graph = graphs[0]
 
-    states = [n.get_name().strip('"') for n in graph.get_nodes() if n.get_name() not in ('node','I')]
+    states = [
+        n.get_name().strip('"')
+        for n in graph.get_nodes()
+        if n.get_name() not in ("node", "I")
+    ]
     # find initial state via I -> X edge
     init_edges = [e for e in graph.get_edges() if e.get_source() == "I"]
     initial = init_edges[0].get_destination().strip('"') if init_edges else states[0]
@@ -40,10 +47,12 @@ def load_dot(path):
         "states": states,
         "initial": initial,
         "alphabet": sorted(alphabet),
-        "transitions": transitions
+        "transitions": transitions,
     }
 
+
 # --- Spot conversion helpers ---
+
 
 def parse_formula_side(side):
     """Return dict {ap: 0/1} from a conjunction like 'a & !b'."""
@@ -58,11 +67,13 @@ def parse_formula_side(side):
             literals[tok.strip()] = 1
     return literals
 
+
 def simplify_disjunction(expr):
     """Pick one disjunct (first) from '(... ) | (... )'."""
     if "|" in expr:
         return expr.split("|", 1)[0].strip("() ")
     return expr.strip("() ")
+
 
 def step_to_spot(step, ap_order):
     """Convert 'inp/out' to full Spot semantics valuation."""
@@ -83,11 +94,12 @@ def step_to_spot(step, ap_order):
     # fill all APs in order
     return "&".join(ap if literals.get(ap, 0) else f"!{ap}" for ap in ap_order)
 
+
 def trace_to_spot(trace, ap_order):
     steps = []
     cycle_part = ""
     if "cycle{" in trace:
-        prefix, cycle_part = trace.split("cycle{",1)
+        prefix, cycle_part = trace.split("cycle{", 1)
         cycle_part = "cycle{" + cycle_part
         raw_steps = [s for s in prefix.split(";") if s.strip()]
     else:
@@ -98,7 +110,9 @@ def trace_to_spot(trace, ap_order):
         steps.append(cycle_part)
     return ";".join(steps)
 
+
 # --- Trace generation ---
+
 
 def generate_trace(machine, length=10, cycle=False):
     state = machine["initial"]
@@ -118,13 +132,23 @@ def generate_trace(machine, length=10, cycle=False):
         trace.append("cycle{1}")
     return ";".join(trace)
 
+
 # --- Main ---
 
+
 def main():
-    parser = argparse.ArgumentParser(description="Random trace generator with Spot semantics output.")
+    parser = argparse.ArgumentParser(
+        description="Random trace generator with Spot semantics output."
+    )
     parser.add_argument("file", help="Path to automaton (JSON or DOT).")
-    parser.add_argument("--fmt", choices=["json","dot"], required=True, help="File format")
-    parser.add_argument("--aps", required=True, help="Comma-separated list of APs in fixed order, e.g. a,b,p0,p1")
+    parser.add_argument(
+        "--fmt", choices=["json", "dot"], required=True, help="File format"
+    )
+    parser.add_argument(
+        "--aps",
+        required=True,
+        help="Comma-separated list of APs in fixed order, e.g. a,b,p0,p1",
+    )
     parser.add_argument("-n", "--num", type=int, default=5, help="Number of traces")
     parser.add_argument("-l", "--length", type=int, default=10, help="Trace length")
     parser.add_argument("--cycle", action="store_true", help="Append cycle{1} at end")
@@ -140,6 +164,7 @@ def main():
     for i in range(args.num):
         raw_trace = generate_trace(machine, length=args.length, cycle=args.cycle)
         print(trace_to_spot(raw_trace, ap_order))
+
 
 if __name__ == "__main__":
     main()

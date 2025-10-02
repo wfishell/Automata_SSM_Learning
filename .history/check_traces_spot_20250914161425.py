@@ -1,19 +1,36 @@
-def Check_Traces(tlsf_file, hoa_file="controller.hoa", trace_dir="HOA_Traces", output_dir="ParsedTraces"):
+def Check_Traces(
+    tlsf_file,
+    hoa_file="controller.hoa",
+    trace_dir="HOA_Traces",
+    output_dir="ParsedTraces",
+):
     """
     Check all traces in trace_dir against the automaton in hoa_file.
     Inputs + outputs are extracted automatically from the TLSF file via syfco.
     Spot-encoded traces are written into output_dir and overall validity % is reported.
     """
     # Extract APs (inputs then outputs)
-    inputs = subprocess.run(
-        ["syfco", "--print-input-signals", tlsf_file],
-        capture_output=True, text=True, check=True
-    ).stdout.replace(" ", "").strip()
+    inputs = (
+        subprocess.run(
+            ["syfco", "--print-input-signals", tlsf_file],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        .stdout.replace(" ", "")
+        .strip()
+    )
 
-    outputs = subprocess.run(
-        ["syfco", "--print-output-signals", tlsf_file],
-        capture_output=True, text=True, check=True
-    ).stdout.replace(" ", "").strip()
+    outputs = (
+        subprocess.run(
+            ["syfco", "--print-output-signals", tlsf_file],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        .stdout.replace(" ", "")
+        .strip()
+    )
 
     aps = [ap for ap in (inputs + "," + outputs).split(",") if ap]
 
@@ -35,7 +52,7 @@ def Check_Traces(tlsf_file, hoa_file="controller.hoa", trace_dir="HOA_Traces", o
                 end = line.find("}")
                 if start == -1 or end == -1:
                     continue
-                raw = line[start+1:end].strip()
+                raw = line[start + 1 : end].strip()
                 if raw:
                     present = {tok.strip().strip("'\"") for tok in raw.split(",")}
                 else:
@@ -66,7 +83,7 @@ def Check_Traces(tlsf_file, hoa_file="controller.hoa", trace_dir="HOA_Traces", o
                 ["autfilt", hoa_file, f"--accept-word={spot_word}"],
                 check=False,
                 text=True,
-                capture_output=True
+                capture_output=True,
             )
             total_count += 1
             if result.returncode == 0:

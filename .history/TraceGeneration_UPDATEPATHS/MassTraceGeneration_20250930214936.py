@@ -6,8 +6,8 @@ Date: September 2025
 Runs pipeline.py multiple times to generate Spot traces and writes them to file.
 """
 
-import sys
 import subprocess
+import sys
 from pathlib import Path
 
 
@@ -21,6 +21,7 @@ def run_pipeline(tlsf_file: str, config_file: str):
 def extract_trace(stdout: str):
     """Pull the trace string from pipeline.py's output log/dict."""
     import re
+
     # Match something like "'trace': '...';"
     m = re.search(r"'trace':\s*'([^']+)'", stdout)
     if not m:
@@ -28,7 +29,9 @@ def extract_trace(stdout: str):
     return m.group(1)
 
 
-def generate_traces(tlsf_file: str, config_file: str, num_traces: int, output_file: str):
+def generate_traces(
+    tlsf_file: str, config_file: str, num_traces: int, output_file: str
+):
     traces = []
     for i in range(num_traces):
         print(f"[+] Run {i+1}/{num_traces}")

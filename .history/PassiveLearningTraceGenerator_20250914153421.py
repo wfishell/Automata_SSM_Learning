@@ -1,6 +1,7 @@
 import os
-import sys
 import re
+import sys
+
 
 def convert_trace(trace: str):
     """

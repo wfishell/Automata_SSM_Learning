@@ -5,12 +5,15 @@ splits into I/O valuations, and runs convert_i_o_traces_for_RPNI.
 """
 
 from pathlib import Path
-from typing import List, Dict, Tuple
+from typing import Dict, List, Tuple
 
 # TODO: import your actual conversion function
 # from your_module import convert_i_o_traces_for_RPNI
 
-def parse_step(step: str, inputs: List[str], outputs: List[str]) -> Tuple[Dict[str,int], Dict[str,int]]:
+
+def parse_step(
+    step: str, inputs: List[str], outputs: List[str]
+) -> Tuple[Dict[str, int], Dict[str, int]]:
     """Parse one step like 'cancel&!grant&!go&!req' into input/output dicts."""
     atoms = step.split("&")
     valuation = {}
@@ -24,6 +27,7 @@ def parse_step(step: str, inputs: List[str], outputs: List[str]) -> Tuple[Dict[s
     out_dict = {k: valuation.get(k, 0) for k in outputs}
     return in_dict, out_dict
 
+
 def parse_trace(line: str, inputs: List[str], outputs: List[str]):
     """Parse one full trace line into [(inputs, outputs), ...]."""
     line = line.strip()
@@ -33,6 +37,7 @@ def parse_trace(line: str, inputs: List[str], outputs: List[str]):
     steps = line.split(";")
     trace = [parse_step(s, inputs, outputs) for s in steps if s]
     return trace
+
 
 def process_file(trace_file: str, inputs: List[str], outputs: List[str]):
     lines = Path(trace_file).read_text().splitlines()
@@ -47,6 +52,7 @@ def process_file(trace_file: str, inputs: List[str], outputs: List[str]):
             converted = f"(Dummy output) would convert {trace}"
         print("[Trace {i+1}] Converted for RPNI:")
         print(converted)
+
 
 if __name__ == "__main__":
     # Example: define which variables are inputs and outputs

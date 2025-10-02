@@ -4,12 +4,15 @@ Now saves the learned automaton in HOA format.
 """
 
 from pathlib import Path
-from typing import List, Dict, Tuple
-from aalpy.utils import convert_i_o_traces_for_RPNI
+from typing import Dict, List, Tuple
+
 from aalpy.learning_algs.deterministic_passive.RPNI import run_RPNI
+from aalpy.utils import convert_i_o_traces_for_RPNI
 
 
-def parse_step(step: str, inputs: List[str], outputs: List[str]) -> Tuple[Dict[str,int], str]:
+def parse_step(
+    step: str, inputs: List[str], outputs: List[str]
+) -> Tuple[Dict[str, int], str]:
     atoms = step.split("&")
     valuation = {}
     for atom in atoms:
@@ -30,6 +33,7 @@ def parse_trace(line: str, inputs: List[str], outputs: List[str]):
     steps = [s for s in line.split(";") if s]
     return [parse_step(s, inputs, outputs) for s in steps]
 
+
 def make_prefix_closed(trace):
     """
     Convert a trace like [((1,0,0), "0"), ((1,0,1), "0"), ((0,1,1), "1")]
@@ -37,10 +41,11 @@ def make_prefix_closed(trace):
     """
     dataset = []
     input_prefix = []
-    for (inp, out) in trace:
+    for inp, out in trace:
         input_prefix.append(inp)
         dataset.append((tuple(input_prefix), out))
     return dataset
+
 
 def process_file(trace_file: str, inputs: List[str], outputs: List[str]):
     lines = Path(trace_file).read_text().splitlines()
@@ -53,8 +58,6 @@ def process_file(trace_file: str, inputs: List[str], outputs: List[str]):
         for ex in prefix_closed:
             print("   ", ex)
     return dataset
-
-
 
 
 def save_mealy_as_hoa(mealy, filename="learned_mealy.hoa"):

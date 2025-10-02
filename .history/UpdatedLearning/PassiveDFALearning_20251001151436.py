@@ -6,6 +6,7 @@ Exports HOA.
 
 from pathlib import Path
 from typing import List, Tuple
+
 from aalpy.learning_algs.deterministic_passive.RPNI import run_RPNI
 
 

@@ -1,6 +1,7 @@
 import os
-import sys
 import re
+import sys
+
 
 def convert_trace(trace: str, aps_order):
     """
@@ -35,7 +36,9 @@ def convert_trace(trace: str, aps_order):
 
 def main():
     if len(sys.argv) != 4:
-        print("Usage: python convert_traces.py <input_dir> <output_dir> <comma_separated_APs>")
+        print(
+            "Usage: python convert_traces.py <input_dir> <output_dir> <comma_separated_APs>"
+        )
         sys.exit(1)
 
     input_dir = sys.argv[1]

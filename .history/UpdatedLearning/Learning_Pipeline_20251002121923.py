@@ -1,46 +1,77 @@
 import os
 import subprocess
+
 import pandas as pd
 
-def SynthesizeMealy(file_path):
-    inputs = subprocess.run(
-        ["syfco", "--print-input-signals", file_path],
-        capture_output=True, text=True, check=True
-    ).stdout.replace(" ", "").strip()
 
-    outputs = subprocess.run(
-        ["syfco", "--print-output-signals", file_path],
-        capture_output=True, text=True, check=True
-    ).stdout.replace(" ", "").strip()
+def SynthesizeMealy(file_path):
+    inputs = (
+        subprocess.run(
+            ["syfco", "--print-input-signals", file_path],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        .stdout.replace(" ", "")
+        .strip()
+    )
+
+    outputs = (
+        subprocess.run(
+            ["syfco", "--print-output-signals", file_path],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        .stdout.replace(" ", "")
+        .strip()
+    )
 
     APs = ",".join([inputs, outputs]) if outputs else inputs
 
-    subprocess.run(f"ltlsynt --hide-status --tlsf {file_path} > System.hoa",
-                   shell=True, check=True)
-    subprocess.run(f"ltlsynt --hide-status --tlsf {file_path} --dot > System.dot",
-                   shell=True, check=True)
+    subprocess.run(
+        f"ltlsynt --hide-status --tlsf {file_path} > System.hoa", shell=True, check=True
+    )
+    subprocess.run(
+        f"ltlsynt --hide-status --tlsf {file_path} --dot > System.dot",
+        shell=True,
+        check=True,
+    )
 
     return APs, inputs, outputs
 
 
-def GenerateTraces(dot_file, aps, num_traces=100, trace_length=10, output_file="Training_Dataset.txt"):
-    subprocess.run([
-        "python", "Dot_Trace_Generator.py",
-        dot_file,
-        "--fmt", "dot",
-        "--aps", aps,
-        "-n", str(num_traces),
-        "-l", str(trace_length),
-        "--cycle",
-        "--out", output_file
-    ], check=True)
+def GenerateTraces(
+    dot_file, aps, num_traces=100, trace_length=10, output_file="Training_Dataset.txt"
+):
+    subprocess.run(
+        [
+            "python",
+            "Dot_Trace_Generator.py",
+            dot_file,
+            "--fmt",
+            "dot",
+            "--aps",
+            aps,
+            "-n",
+            str(num_traces),
+            "-l",
+            str(trace_length),
+            "--cycle",
+            "--out",
+            output_file,
+        ],
+        check=True,
+    )
 
 
 def CheckTraces(hoa_file, data_file):
     """Run Trace_Checker and parse acceptance percentage from stdout."""
     result = subprocess.run(
         ["python", "Trace_Checker.py", hoa_file, data_file],
-        capture_output=True, text=True, check=True
+        capture_output=True,
+        text=True,
+        check=True,
     )
     # Look for the line with "Acceptance %:"
     acc = None
@@ -51,13 +82,14 @@ def CheckTraces(hoa_file, data_file):
 
 
 def PassiveLearning(data_file, inputs, outputs):
-    subprocess.run([
-        "python", "Passive_Mealy_Learning.py", data_file, inputs, outputs
-    ], check=True)
+    subprocess.run(
+        ["python", "Passive_Mealy_Learning.py", data_file, inputs, outputs], check=True
+    )
 
     subprocess.run(
         "autfilt Training_Dataset.hoa --dot > Training_Dataset.dot",
-        shell=True, check=True
+        shell=True,
+        check=True,
     )
 
 
@@ -94,13 +126,15 @@ if __name__ == "__main__":
         print(f"\n[+] Running pipeline for {full_path}")
         acc = PassivePipeline(full_path, num_traces, length)
 
-        results.append({
-            "file": file,
-            "num_traces": num_traces,
-            "length": length,
-            "samples": samples,
-            "accuracy": acc
-        })
+        results.append(
+            {
+                "file": file,
+                "num_traces": num_traces,
+                "length": length,
+                "samples": samples,
+                "accuracy": acc,
+            }
+        )
 
     df = pd.DataFrame(results)
     print("\n=== Summary DataFrame ===")

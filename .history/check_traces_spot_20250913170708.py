@@ -1,7 +1,7 @@
 # check_trace.py
 import re
-import sys
 import subprocess
+import sys
 
 if len(sys.argv) < 3:
     print("Usage: python check_trace.py <hoa_file> <ap1> <ap2> ...")
@@ -49,11 +49,13 @@ try:
         ["autfilt", hoa_file, f"--accept-word={spot_word}"],
         check=False,
         text=True,
-        capture_output=True
+        capture_output=True,
     )
     if result.returncode == 0:
         print("✅ Trace is ACCEPTED by automaton.")
     else:
         print("❌ Trace is REJECTED by automaton.")
 except FileNotFoundError:
-    print("Error: autfilt not found in PATH. Install Spot and make sure autfilt is accessible.")
+    print(
+        "Error: autfilt not found in PATH. Install Spot and make sure autfilt is accessible."
+    )

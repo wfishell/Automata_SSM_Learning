@@ -1,6 +1,4 @@
-
 import json
-
 # import getopt
 import logging
 import os

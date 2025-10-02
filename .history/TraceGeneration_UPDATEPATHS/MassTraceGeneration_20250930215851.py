@@ -13,7 +13,9 @@ from pathlib import Path
 from pipeline import pipeline
 
 
-def generate_traces(tlsf_file: str, config_file: str, num_traces: int, output_file: str):
+def generate_traces(
+    tlsf_file: str, config_file: str, num_traces: int, output_file: str
+):
     lines = []
     for i in range(num_traces):
         print(f"[+] Run {i+1}/{num_traces}")

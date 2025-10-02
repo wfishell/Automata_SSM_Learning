@@ -18,7 +18,10 @@ import sys
 try:
     from aalpy.learning_algs.deterministic_passive.RPNI import run_RPNI
 except ImportError:
-    print("Error: Could not import AALPy. Install with `pip install aalpy`.", file=sys.stderr)
+    print(
+        "Error: Could not import AALPy. Install with `pip install aalpy`.",
+        file=sys.stderr,
+    )
     sys.exit(1)
 
 
@@ -32,11 +35,13 @@ def parse_binary_trace(line: str, input_names, output_names):
             raise ValueError(
                 f"Step {idx}: got {len(bits)} bits, expected {len(input_names) + len(output_names)}. Step={step}"
             )
-        in_bits = bits[:len(input_names)]
-        out_bits = bits[len(input_names):]
+        in_bits = bits[: len(input_names)]
+        out_bits = bits[len(input_names) :]
 
         input_tok = ",".join(f"{name}={val}" for name, val in zip(input_names, in_bits))
-        output_tok = ",".join(f"{name}={val}" for name, val in zip(output_names, out_bits))
+        output_tok = ",".join(
+            f"{name}={val}" for name, val in zip(output_names, out_bits)
+        )
 
         trace.append((input_tok, output_tok))
     return trace
@@ -56,8 +61,8 @@ def save_hoa(model, path: str, input_names, output_names):
     """Save the learned Mealy machine in HOA-like format (for Spot compatibility)."""
     with open(path, "w") as f:
         f.write("HOA: v1\n")
-        f.write("name: \"Learned Mealy Machine\"\n")
-        f.write("tool: \"RPNI Learning\"\n")
+        f.write('name: "Learned Mealy Machine"\n')
+        f.write('tool: "RPNI Learning"\n')
         f.write(f"States: {len(model.states)}\n")
 
         aps = input_names + output_names
@@ -104,10 +109,18 @@ def main():
     parser = argparse.ArgumentParser(
         description="Learn a deterministic Mealy machine from binary traces via RPNI."
     )
-    parser.add_argument("trace_file", help="Path to file with binary traces (one per line).")
-    parser.add_argument("inputs", help="Comma-separated input AP names, e.g. 'go,req,cancel'")
+    parser.add_argument(
+        "trace_file", help="Path to file with binary traces (one per line)."
+    )
+    parser.add_argument(
+        "inputs", help="Comma-separated input AP names, e.g. 'go,req,cancel'"
+    )
     parser.add_argument("outputs", help="Comma-separated output AP names, e.g. 'grant'")
-    parser.add_argument("--dump-hoa", default="result.hoa", help="Path to save learned HOA (default=result.hoa)")
+    parser.add_argument(
+        "--dump-hoa",
+        default="result.hoa",
+        help="Path to save learned HOA (default=result.hoa)",
+    )
     args = parser.parse_args()
 
     input_names = [s.strip() for s in args.inputs.split(",") if s.strip()]
@@ -121,7 +134,9 @@ def main():
 
     dataset = make_prefix_closed_dataset(lines, input_names, output_names)
 
-    print(f"Loaded {len(lines)} traces, created {len(dataset)} prefix-closed sequences.")
+    print(
+        f"Loaded {len(lines)} traces, created {len(dataset)} prefix-closed sequences."
+    )
 
     # Learn Mealy machine
     mealy = run_RPNI(data=dataset, automaton_type="mealy", algorithm="classic")

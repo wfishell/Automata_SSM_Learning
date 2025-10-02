@@ -5,7 +5,8 @@ splits into I/O valuations, and runs convert_i_o_traces_for_RPNI.
 """
 
 from pathlib import Path
-from typing import List, Dict, Tuple
+from typing import Dict, List, Tuple
+
 from aalpy.utils import convert_i_o_traces_for_RPNI
 
 

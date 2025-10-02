@@ -1,6 +1,8 @@
 import os
 import subprocess
+
 import pandas as pd
+
 
 def SynthesizeMealy(file_path):
     inputs = subprocess.run(

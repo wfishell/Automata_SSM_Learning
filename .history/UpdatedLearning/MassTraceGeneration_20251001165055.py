@@ -5,7 +5,9 @@ from pathlib import Path
 from pipeline import pipeline_from_tlsf  # use the TLSF-based pipeline
 
 
-def generate_traces(tlsf_file: str, config_file: str, num_traces: int, output_file: str):
+def generate_traces(
+    tlsf_file: str, config_file: str, num_traces: int, output_file: str
+):
     pos_lines = []
     neg_lines = []
 
@@ -30,7 +32,9 @@ def generate_traces(tlsf_file: str, config_file: str, num_traces: int, output_fi
     content = "\n".join(pos_lines) + "\n------\n" + "\n".join(neg_lines)
     Path(output_file).write_text(content)
 
-    print(f"[+] Wrote {num_traces} positive and {num_traces} negative traces to {output_file}")
+    print(
+        f"[+] Wrote {num_traces} positive and {num_traces} negative traces to {output_file}"
+    )
 
 
 if __name__ == "__main__":

@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
 import os
-import sys
 import subprocess
+import sys
 
 if len(sys.argv) < 5:
-    print("Usage: python check_traces_spot.py <aps> <hoa_file> <hoa_traces_dir> <output_dir>")
-    print("Example: python check_traces_spot.py 'a b c d' controller.hoa HOA_Traces SpotTraces")
+    print(
+        "Usage: python check_traces_spot.py <aps> <hoa_file> <hoa_traces_dir> <output_dir>"
+    )
+    print(
+        "Example: python check_traces_spot.py 'a b c d' controller.hoa HOA_Traces SpotTraces"
+    )
     sys.exit(1)
 
 aps_arg = sys.argv[1]
 hoa_file = sys.argv[2]
-trace_dir = sys.argv[3]   # e.g., HOA_Traces
+trace_dir = sys.argv[3]  # e.g., HOA_Traces
 output_dir = sys.argv[4]  # e.g., SpotTraces
 
 # Parse APs (split by whitespace, remove empty tokens)
@@ -35,7 +39,7 @@ for fname in os.listdir(trace_dir):
             end = line.find("}")
             if start == -1 or end == -1:
                 continue
-            raw = line[start+1:end].strip()
+            raw = line[start + 1 : end].strip()
             if raw:
                 present = {tok.strip().strip("'\"") for tok in raw.split(",")}
             else:
@@ -70,7 +74,7 @@ for fname in os.listdir(trace_dir):
             ["autfilt", hoa_file, f"--accept-word={spot_word}"],
             check=False,
             text=True,
-            capture_output=True
+            capture_output=True,
         )
         total_count += 1
         if result.returncode == 0:

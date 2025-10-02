@@ -1,6 +1,7 @@
 import os
 import subprocess
 
+
 def SynthesizeMealy(file_path):
     # Get inputs
     inputs = subprocess.run(

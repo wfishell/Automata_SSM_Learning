@@ -8,6 +8,7 @@ Trace Converter + RPNI DFA Learner (Positive/Negative Traces)
 
 from pathlib import Path
 from typing import List, Tuple
+
 from aalpy.learning_algs.deterministic_passive.RPNI import run_RPNI
 
 
@@ -65,7 +66,9 @@ def process_file(trace_file: str, aps: List[str]):
     return dataset
 
 
-def save_dfa_as_hoa(dfa, aps: List[str], controllable: List[str], filename="learned_dfa.hoa"):
+def save_dfa_as_hoa(
+    dfa, aps: List[str], controllable: List[str], filename="learned_dfa.hoa"
+):
     ap_indices = {ap: i for i, ap in enumerate(aps)}
     states = list(dfa.states)
     state_ids = {s: i for i, s in enumerate(states)}
@@ -74,13 +77,17 @@ def save_dfa_as_hoa(dfa, aps: List[str], controllable: List[str], filename="lear
         f.write("HOA: v1\n")
         f.write(f"States: {len(states)}\n")
         f.write(f"Start: {state_ids[dfa.initial_state]}\n")
-        f.write(f"AP: {len(aps)} " + " ".join(f"\"{ap}\"" for ap in aps) + "\n")
+        f.write(f"AP: {len(aps)} " + " ".join(f'"{ap}"' for ap in aps) + "\n")
         f.write("acc-name: Buchi\n")
         f.write("Acceptance: 1 Inf(0)\n")
         f.write("properties: trans-labels explicit-labels state-acc deterministic\n")
 
         if controllable:
-            f.write("controllable-AP: " + " ".join(str(ap_indices[o]) for o in controllable) + "\n")
+            f.write(
+                "controllable-AP: "
+                + " ".join(str(ap_indices[o]) for o in controllable)
+                + "\n"
+            )
 
         f.write("--BODY--\n")
 
@@ -104,6 +111,7 @@ def save_dfa_as_hoa(dfa, aps: List[str], controllable: List[str], filename="lear
 
 if __name__ == "__main__":
     import sys
+
     if len(sys.argv) < 2:
         print("Usage: python PassiveDFALearning_PosNeg.py <trace_file>")
         sys.exit(1)

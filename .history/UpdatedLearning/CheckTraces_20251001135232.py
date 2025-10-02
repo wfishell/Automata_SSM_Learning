@@ -1,6 +1,6 @@
 # check_traces_simple.py
-import sys
 import subprocess
+import sys
 
 if len(sys.argv) != 3:
     print("Usage: python check_traces_simple.py <hoa_file> <trace_file>")
@@ -21,7 +21,7 @@ with open(trace_file, "r") as f:
         result = subprocess.run(
             ["autfilt", hoa_file, f"--accept-word={trace}"],
             capture_output=True,
-            text=True
+            text=True,
         )
         if result.returncode == 0:
             accepted += 1

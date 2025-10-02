@@ -10,7 +10,9 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 os.environ["PATH"] = "/usr/local/bin:" + os.environ["PATH"]
-os.environ["LD_LIBRARY_PATH"] = "/usr/local/lib:" + os.environ.get("LD_LIBRARY_PATH", "")
+os.environ["LD_LIBRARY_PATH"] = "/usr/local/lib:" + os.environ.get(
+    "LD_LIBRARY_PATH", ""
+)
 
 
 def run_ltlsynt(tlsf_file: Path, hoa_file: Path):
@@ -153,8 +155,12 @@ def pipeline_from_tlsf(tlsf_file: str, config_file: str):
         rej_accepts_neg = run_autfilt_accept(rejector_file, neg_trace, rej_accept_file)
 
         # === Cross validation ===
-        sys_accepts_neg = run_autfilt_accept(hoa_file, neg_trace, Path(results_dir / "11-system.checks.neg"))
-        rej_accepts_pos = run_autfilt_accept(rejector_file, pos_trace, Path(results_dir / "12-rejector.checks.pos"))
+        sys_accepts_neg = run_autfilt_accept(
+            hoa_file, neg_trace, Path(results_dir / "11-system.checks.neg")
+        )
+        rej_accepts_pos = run_autfilt_accept(
+            rejector_file, pos_trace, Path(results_dir / "12-rejector.checks.pos")
+        )
 
         # Write validation log
         with open(log_file, "w") as f:

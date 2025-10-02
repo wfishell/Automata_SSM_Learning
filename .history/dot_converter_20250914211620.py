@@ -1,6 +1,7 @@
 import re
 import sys
 
+
 def parse_dot(dot_file):
     """Parse DOT file with Mealy-style transitions (input / output)."""
     states = set()
@@ -31,8 +32,12 @@ def write_hoa(states, transitions, inputs, outputs, out_file):
         f.write("HOA: v1\n")
         f.write(f"States: {len(states)}\n")
         f.write("Start: 0\n")
-        f.write("AP: {} {}\n".format(len(inputs) + len(outputs),
-            " ".join([f"\"{x}\"" for x in inputs + outputs])))
+        f.write(
+            "AP: {} {}\n".format(
+                len(inputs) + len(outputs),
+                " ".join([f'"{x}"' for x in inputs + outputs]),
+            )
+        )
         f.write("acc-name: all\n")
         f.write("Acceptance: 0 t\n")
         f.write("properties: trans-labels explicit-labels deterministic\n")

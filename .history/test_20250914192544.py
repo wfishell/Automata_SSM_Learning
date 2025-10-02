@@ -27,11 +27,13 @@ def parse_binary_trace(line: str, input_names, output_names):
             raise ValueError(
                 f"Step {idx}: got {len(bits)} bits, expected {len(input_names) + len(output_names)}. Step={step}"
             )
-        in_bits = bits[:len(input_names)]
-        out_bits = bits[len(input_names):]
+        in_bits = bits[: len(input_names)]
+        out_bits = bits[len(input_names) :]
 
         input_tok = ",".join(f"{name}={val}" for name, val in zip(input_names, in_bits))
-        output_tok = ",".join(f"{name}={val}" for name, val in zip(output_names, out_bits))
+        output_tok = ",".join(
+            f"{name}={val}" for name, val in zip(output_names, out_bits)
+        )
 
         trace.append((input_tok, output_tok))
     return trace
@@ -51,8 +53,12 @@ def main():
     parser = argparse.ArgumentParser(
         description="Convert binary traces to prefix-closed dataset for RPNI Mealy learning."
     )
-    parser.add_argument("trace_file", help="Path to file with binary traces (one per line).")
-    parser.add_argument("inputs", help="Comma-separated input AP names, e.g. 'go,req,cancel'")
+    parser.add_argument(
+        "trace_file", help="Path to file with binary traces (one per line)."
+    )
+    parser.add_argument(
+        "inputs", help="Comma-separated input AP names, e.g. 'go,req,cancel'"
+    )
     parser.add_argument("outputs", help="Comma-separated output AP names, e.g. 'grant'")
     args = parser.parse_args()
 

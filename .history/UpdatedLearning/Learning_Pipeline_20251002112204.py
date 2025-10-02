@@ -1,60 +1,84 @@
 import os
 import subprocess
 
+
 def SynthesizeMealy(file_path):
     # Get inputs
-    inputs = subprocess.run(
-        ["syfco", "--print-input-signals", file_path],
-        capture_output=True, text=True, check=True
-    ).stdout.replace(" ", "").strip()
+    inputs = (
+        subprocess.run(
+            ["syfco", "--print-input-signals", file_path],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        .stdout.replace(" ", "")
+        .strip()
+    )
 
     # Get outputs
-    outputs = subprocess.run(
-        ["syfco", "--print-output-signals", file_path],
-        capture_output=True, text=True, check=True
-    ).stdout.replace(" ", "").strip()
+    outputs = (
+        subprocess.run(
+            ["syfco", "--print-output-signals", file_path],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        .stdout.replace(" ", "")
+        .strip()
+    )
 
     # Combined APs string (comma-separated)
     APs = ",".join([inputs, outputs]) if outputs else inputs
 
     # Generate HOA and DOT files via shell piping (with `>`)
-    subprocess.run(f"ltlsynt --hide-status --tlsf {file_path} > System.hoa",
-                   shell=True, check=True)
-    subprocess.run(f"ltlsynt --hide-status --tlsf {file_path} --dot > System.dot",
-                   shell=True, check=True)
+    subprocess.run(
+        f"ltlsynt --hide-status --tlsf {file_path} > System.hoa", shell=True, check=True
+    )
+    subprocess.run(
+        f"ltlsynt --hide-status --tlsf {file_path} --dot > System.dot",
+        shell=True,
+        check=True,
+    )
 
     return APs, inputs, outputs
 
 
-
-def GenerateTraces(dot_file, aps, num_traces=100, trace_length=10, output_file="Training_Dataset.txt"):
+def GenerateTraces(
+    dot_file, aps, num_traces=100, trace_length=10, output_file="Training_Dataset.txt"
+):
     """Generate traces using Dot_Trace_Generator."""
-    subprocess.run([
-        "python", "Dot_Trace_Generator.py",
-        dot_file,
-        "--fmt", "dot",
-        "--aps", aps,
-        "-n", str(num_traces),
-        "-l", str(trace_length),
-        "--cycle",
-        "--out", output_file
-    ], check=True)
+    subprocess.run(
+        [
+            "python",
+            "Dot_Trace_Generator.py",
+            dot_file,
+            "--fmt",
+            "dot",
+            "--aps",
+            aps,
+            "-n",
+            str(num_traces),
+            "-l",
+            str(trace_length),
+            "--cycle",
+            "--out",
+            output_file,
+        ],
+        check=True,
+    )
 
 
 def CheckTraces(hoa_file, data_file):
     """Check traces using Trace_Checker."""
-    subprocess.run([
-        "python", "Trace_Checker.py", hoa_file, data_file
-    ], check=True)
+    subprocess.run(["python", "Trace_Checker.py", hoa_file, data_file], check=True)
 
 
 def PassiveLearning(data_file, inputs, outputs):
     """Run passive learning on traces."""
-    subprocess.run([
-        "python", "Passive_Mealy_Learning.py", data_file, inputs, outputs
-    ], check=True)
+    subprocess.run(
+        ["python", "Passive_Mealy_Learning.py", data_file, inputs, outputs], check=True
+    )
 
-   
     subprocess.run(["autfilt", "Training_Data.hoa", "--dot"], stdout=f, check=True)
 
 
@@ -62,26 +86,46 @@ def ActiveLearning(tlsf_file):
     """Run active learning with L* and random walk equivalence."""
 
     # Get inputs and outputs
-    inputs = subprocess.run(
-        ["syfco", "--print-input-signals", tlsf_file],
-        capture_output=True, text=True, check=True
-    ).stdout.replace(" ", "").strip()
+    inputs = (
+        subprocess.run(
+            ["syfco", "--print-input-signals", tlsf_file],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        .stdout.replace(" ", "")
+        .strip()
+    )
 
-    outputs = subprocess.run(
-        ["syfco", "--print-output-signals", tlsf_file],
-        capture_output=True, text=True, check=True
-    ).stdout.replace(" ", "").strip()
+    outputs = (
+        subprocess.run(
+            ["syfco", "--print-output-signals", tlsf_file],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        .stdout.replace(" ", "")
+        .strip()
+    )
 
     # Run active learning script
     result = subprocess.run(
         [
-            "python", "ActiveLearning.py", "controller.dot",
-            "--inputs", inputs,
-            "--outputs", outputs,
-            "--algorithm", "lstar",
-            "--eq", "random_walk"
+            "python",
+            "ActiveLearning.py",
+            "controller.dot",
+            "--inputs",
+            inputs,
+            "--outputs",
+            outputs,
+            "--algorithm",
+            "lstar",
+            "--eq",
+            "random_walk",
         ],
-        capture_output=True, text=True, check=True
+        capture_output=True,
+        text=True,
+        check=True,
     )
 
     print("STDOUT:\n", result.stdout)
@@ -89,7 +133,9 @@ def ActiveLearning(tlsf_file):
 
     # Convert learned HOA to DOT
     with open("controller_learned.dot", "w") as f:
-        subprocess.run(["autfilt", "controller_learned.hoa", "--dot"], stdout=f, check=True)
+        subprocess.run(
+            ["autfilt", "controller_learned.hoa", "--dot"], stdout=f, check=True
+        )
 
 
 def PassivePipeline(tlsf_file, num_traces=10, length=10):
@@ -106,6 +152,7 @@ def PassivePipeline(tlsf_file, num_traces=10, length=10):
     GenerateTraces("Training_Data.dot", APs, num_traces, length, "Test_Dataset.txt")
 
     CheckTraces("System.hoa", "Test_Dataset.txt")
+
 
 if __name__ == "__main__":
     directory = "/Users/will/github/Automata_SSM_Learning/TestSet/SyntCompBenchMarks/"

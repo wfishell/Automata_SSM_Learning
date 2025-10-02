@@ -5,7 +5,7 @@ if __name__ == "__main__":
         print("Usage: python convert_i_o_traces.py <trace_file>")
         sys.exit(1)
 
-    trace_file = sys.argv[1]   # first argument after the script name
+    trace_file = sys.argv[1]  # first argument after the script name
 
     INPUTS = ["r_0", "r_1"]
     OUTPUTS = ["g_0", "g_1"]

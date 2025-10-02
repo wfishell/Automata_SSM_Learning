@@ -5,11 +5,14 @@ splits into I/O valuations, and runs convert_i_o_traces_for_RPNI.
 """
 
 from pathlib import Path
-from typing import List, Dict, Tuple
+from typing import Dict, List, Tuple
+
 from aalpy.utils import convert_i_o_traces_for_RPNI
 
 
-def parse_step(step: str, inputs: List[str], outputs: List[str]) -> Tuple[Dict[str,int], str]:
+def parse_step(
+    step: str, inputs: List[str], outputs: List[str]
+) -> Tuple[Dict[str, int], str]:
     """Parse one step like 'cancel&!grant&!go&!req' into (input_dict, output_symbol)."""
     atoms = step.split("&")
     valuation = {}
@@ -43,7 +46,6 @@ def parse_trace(line: str, inputs: List[str], outputs: List[str]):
         trace.append(parsed)
 
     return trace
-
 
 
 def process_file(trace_file: str, inputs: List[str], outputs: List[str]):

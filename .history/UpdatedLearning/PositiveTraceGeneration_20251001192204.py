@@ -10,7 +10,9 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 os.environ["PATH"] = "/usr/local/bin:" + os.environ["PATH"]
-os.environ["LD_LIBRARY_PATH"] = "/usr/local/lib:" + os.environ.get("LD_LIBRARY_PATH", "")
+os.environ["LD_LIBRARY_PATH"] = "/usr/local/lib:" + os.environ.get(
+    "LD_LIBRARY_PATH", ""
+)
 
 
 def extract_hoa_aps(hoa_content: str):

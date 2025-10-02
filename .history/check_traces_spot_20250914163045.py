@@ -1,27 +1,41 @@
 #!/usr/bin/env python3
 import os
-import sys
 import subprocess
+import sys
 
 if len(sys.argv) < 4:
-    print("Usage: python check_traces_spot.py <tlsf_file> <hoa_traces_dir> <output_dir> [hoa_file]")
+    print(
+        "Usage: python check_traces_spot.py <tlsf_file> <hoa_traces_dir> <output_dir> [hoa_file]"
+    )
     sys.exit(1)
 
 tlsf_file = sys.argv[1]
-trace_dir = sys.argv[2]   # e.g., HOA_Traces
+trace_dir = sys.argv[2]  # e.g., HOA_Traces
 output_dir = sys.argv[3]  # e.g., SpotTraces
 hoa_file = sys.argv[4] if len(sys.argv) > 4 else "controller.hoa"
 
 # Get inputs and outputs from TLSF using syfco
-inputs = subprocess.run(
-    ["syfco", "--print-input-signals", tlsf_file],
-    capture_output=True, text=True, check=True
-).stdout.strip().replace("\n", ",")
+inputs = (
+    subprocess.run(
+        ["syfco", "--print-input-signals", tlsf_file],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    .stdout.strip()
+    .replace("\n", ",")
+)
 
-outputs = subprocess.run(
-    ["syfco", "--print-output-signals", tlsf_file],
-    capture_output=True, text=True, check=True
-).stdout.strip().replace("\n", ",")
+outputs = (
+    subprocess.run(
+        ["syfco", "--print-output-signals", tlsf_file],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    .stdout.strip()
+    .replace("\n", ",")
+)
 
 aps = [ap.strip() for ap in (inputs + "," + outputs).split(",") if ap.strip()]
 print("🔎 APs being used:", aps)
@@ -44,7 +58,7 @@ for fname in os.listdir(trace_dir):
             end = line.find("}")
             if start == -1 or end == -1:
                 continue
-            raw = line[start+1:end].strip()
+            raw = line[start + 1 : end].strip()
             if raw:
                 present = {tok.strip().strip("'\"") for tok in raw.split(",")}
             else:
@@ -79,7 +93,7 @@ for fname in os.listdir(trace_dir):
             ["autfilt", hoa_file, f"--accept-word={spot_word}"],
             check=False,
             text=True,
-            capture_output=True
+            capture_output=True,
         )
         total_count += 1
         if result.returncode == 0:

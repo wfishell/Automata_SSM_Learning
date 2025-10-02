@@ -5,12 +5,16 @@ and runs RPNI to infer a Mealy/DFA.
 """
 
 from pathlib import Path
-from typing import List, Dict, Tuple
+from typing import Dict, List, Tuple
+
 from aalpy.learning_algs.deterministic_passive.RPNI import run_RPNI
-from aalpy.utils import convert_i_o_traces_for_RPNI   # ✅ Import the function from AALpy
+from aalpy.utils import \
+    convert_i_o_traces_for_RPNI  # ✅ Import the function from AALpy
 
 
-def parse_step(step: str, inputs: List[str], outputs: List[str]) -> Tuple[Dict[str, int], str]:
+def parse_step(
+    step: str, inputs: List[str], outputs: List[str]
+) -> Tuple[Dict[str, int], str]:
     atoms = step.split("&")
     valuation = {}
     for atom in atoms:
@@ -26,8 +30,6 @@ def parse_step(step: str, inputs: List[str], outputs: List[str]) -> Tuple[Dict[s
     out_symbol = "".join(str(valuation.get(k, 0)) for k in outputs)
 
     return in_dict, out_symbol
-
-
 
 
 def parse_trace(line: str, inputs: List[str], outputs: List[str]):

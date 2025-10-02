@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
+import argparse
 import json
 import random
-import argparse
-import pydot
 import re
+
+import pydot
+
 
 def load_json(path):
     with open(path) as f:

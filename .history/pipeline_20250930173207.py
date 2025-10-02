@@ -10,7 +10,6 @@ If we give it a lot of traces, it can figure out the legal transitions
 """
 
 import json
-
 # import getopt
 import logging
 import os

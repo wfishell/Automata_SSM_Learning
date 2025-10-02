@@ -4,12 +4,15 @@ Now saves the learned automaton in HOA format.
 """
 
 from pathlib import Path
-from typing import List, Dict, Tuple
-from aalpy.utils import convert_i_o_traces_for_RPNI
+from typing import Dict, List, Tuple
+
 from aalpy.learning_algs.deterministic_passive.RPNI import run_RPNI
+from aalpy.utils import convert_i_o_traces_for_RPNI
 
 
-def parse_step(step: str, inputs: List[str], outputs: List[str]) -> Tuple[Dict[str,int], str]:
+def parse_step(
+    step: str, inputs: List[str], outputs: List[str]
+) -> Tuple[Dict[str, int], str]:
     atoms = step.split("&")
     valuation = {}
     for atom in atoms:

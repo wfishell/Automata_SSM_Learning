@@ -1,6 +1,7 @@
 # run_hoax_multi.py
 import subprocess
 import sys
+
 MultipleTraceGenerator
 import os
 
@@ -28,7 +29,7 @@ for i in range(1, num_runs + 1):
             ["hoax", hoa_file, "--config", config_file],
             check=True,
             text=True,
-            capture_output=True
+            capture_output=True,
         )
     except subprocess.CalledProcessError as e:
         print(f"❌ Error in run {i}:")

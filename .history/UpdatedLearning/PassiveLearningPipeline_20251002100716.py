@@ -1,10 +1,12 @@
-import os
-import sys
 import argparse
 import json
+import os
 import random
-import pandas as pd
 import subprocess
+import sys
+
+import pandas as pd
+
 
 def SynthesizeMealy(file_path):
     subprocess.run(f'autfilt --tlsf "{file_path}" > System.hoa',

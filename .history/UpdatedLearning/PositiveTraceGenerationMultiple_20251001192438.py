@@ -5,7 +5,9 @@ from pathlib import Path
 from PositiveTraceGeneration import trace_from_hoa
 
 
-def generate_positive_traces(hoa_file: str, config_file: str, num_traces: int, output_file: str):
+def generate_positive_traces(
+    hoa_file: str, config_file: str, num_traces: int, output_file: str
+):
     traces = []
 
     for i in range(num_traces):
@@ -21,7 +23,9 @@ def generate_positive_traces(hoa_file: str, config_file: str, num_traces: int, o
 
 if __name__ == "__main__":
     if len(sys.argv) < 5:
-        print("Usage: batch_positive_traces.py <system.hoa> <config.toml> <N> <output.txt>")
+        print(
+            "Usage: batch_positive_traces.py <system.hoa> <config.toml> <N> <output.txt>"
+        )
         sys.exit(1)
 
     hoa_file = sys.argv[1]

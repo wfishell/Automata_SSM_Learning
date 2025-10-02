@@ -1,6 +1,7 @@
 import os
 import sys
 
+
 def convert_trace(trace: str):
     """
     Convert a single trace string into 0/1 form.

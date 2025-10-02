@@ -1,8 +1,7 @@
 # run_hoax_multi.py
+import os
 import subprocess
 import sys
-
-import os
 
 if len(sys.argv) < 4:
     print("Usage: python run_hoax_multi.py <hoa_file> <config_file> <num_runs>")
@@ -28,7 +27,7 @@ for i in range(1, num_runs + 1):
             ["hoax", hoa_file, "--config", config_file],
             check=True,
             text=True,
-            capture_output=True
+            capture_output=True,
         )
     except subprocess.CalledProcessError as e:
         print(f"❌ Error in run {i}:")
