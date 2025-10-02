@@ -1,0 +1,154 @@
+import logging
+import os
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+# Configure logger for this module
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)  # Default level, can be changed externally
+
+os.environ["PATH"] = "/usr/local/bin:" + os.environ["PATH"]
+os.environ["LD_LIBRARY_PATH"] = "/usr/local/lib:" + os.environ.get(
+    "LD_LIBRARY_PATH", ""
+)
+
+
+def run_ltlsynt(tlsf_file: Path, hoa_file: Path):
+    """Run ltlsynt on a TLSF file, strip the first line, and save HOA."""
+    cmd = ["ltlsynt", "--tlsf", str(tlsf_file)]
+    logging.debug(f"Running command: {' '.join(cmd)}")
+    res = subprocess.run(cmd, capture_output=True, text=True, check=True)
+    # Drop first line
+    lines = res.stdout.splitlines()[1:]
+    hoa_file.write_text("\n".join(lines))
+
+
+def make_replacement(aps):
+    """Build replacement string for empty set() in hoax output."""
+    parts = [f"'!{ap}'" for ap in aps]
+    return "{" + ", ".join(parts) + "}"
+
+
+def run_hoax(hoa_file: Path, hoax_file: Path, config_file: Path, aps):
+    """Run hoax with config, clean its output, and save result."""
+    cmd = ["hoax", str(hoa_file), "--config", str(config_file)]
+    res = subprocess.run(cmd, capture_output=True, text=True, check=True)
+
+    # Drop last line (like `sed '$d'`)
+    lines = res.stdout.strip().splitlines()[:-1]
+    content = "\n".join(lines)
+
+    # Replace set() with {!ap...}
+    replacement = make_replacement(aps)
+    content = re.sub(r"set\(\)", replacement, content)
+
+    hoax_file.write_text(content)
+
+
+def generate_trace(hoax_file: Path, aps):
+    """Generate trace string from hoax output (Spot word)."""
+    trace = []
+    for line in hoax_file.read_text().splitlines():
+        raw = re.search(r"{(.*)}", line)
+        if not raw:
+            continue
+        present = [tok.strip("'\" ") for tok in raw.group(1).split(",") if tok.strip()]
+        assignment = [ap if ap in present else f"!{ap}" for ap in aps]
+        trace.append("&".join(assignment))
+    return ";".join(trace) + ";cycle{1}"
+
+
+def run_autfilt_stats(hoa_file: Path, stats_file: Path):
+    """Show automaton stats via autfilt."""
+    logger.info("[+] Automaton stats:")
+    with open(stats_file, "w") as f:
+        subprocess.run(
+            ["autfilt", "--stats=%s states, %e edges, %a acc-sets, %c SCCs, det=%d"],
+            input=hoa_file.read_text(),
+            text=True,
+            stdout=f,
+            check=True,
+        )
+
+
+def run_autfilt_accept(hoa_file: Path, trace: str, output_file: Path):
+    """Check acceptance of a trace in automaton using autfilt."""
+    cmd = ["autfilt", f"--accept-word={trace}"]
+    res = subprocess.run(cmd, input=hoa_file.read_bytes(), capture_output=True)
+    output_file.write_bytes(res.stdout)
+    return res.returncode == 0
+
+
+def extract_hoa_aps(hoa_content: str):
+    """Extract the atomic propositions (APs) from the HOA file."""
+    for line in hoa_content.split("\n"):
+        if line.startswith("AP:"):
+            parts = line.split()
+            ap_count = int(parts[1])
+            aps = []
+            for i in range(2, 2 + ap_count):
+                ap_name = parts[i].strip('"')
+                aps.append(ap_name)
+            return aps
+    return []
+
+
+def pipeline(tlsf_file: str, config_file: str):
+    tlsf_path = Path(tlsf_file)
+    base = tlsf_path.stem
+
+    # Create results/<specname> directory
+    results_dir = Path("results") / base
+    results_dir.mkdir(parents=True, exist_ok=True)
+
+    hoa_file = results_dir / "01-system.hoa"
+    hoax_file = results_dir / "02-hoax.cleaned.hoa"
+    trace_file = results_dir / "03-trace.spot.txt"
+    stats_file = results_dir / "04-autfilt.stats.txt"
+    accepted_file = results_dir / "05-autfilt.accepted.hoa"
+    acceptance_log_file = results_dir / "acceptance.log"
+
+    try:
+        logger.info(f"[+] Running ltlsynt on {tlsf_file}")
+        run_ltlsynt(tlsf_path, hoa_file)
+
+        aps = extract_hoa_aps(hoa_file.read_text())
+
+        logger.info(f"[+] Running hoax on {hoa_file}")
+        run_hoax(hoa_file, hoax_file, Path(config_file), aps)
+
+        logger.info("[+] Generating trace")
+        trace = generate_trace(hoax_file, aps)
+        trace_file.write_text(trace)
+
+        logger.info("[+] Automaton stats:")
+        run_autfilt_stats(hoa_file, stats_file)
+
+        logger.info("[+] Checking acceptance")
+        accepted = run_autfilt_accept(hoa_file, trace, accepted_file)
+
+        with open(acceptance_log_file, "w") as f:
+            f.write("Pass.\n" if accepted else "Did not pass.\n")
+
+    except Exception:
+        logger.exception("Pipeline failed")
+        raise
+
+    return {
+        "hoa": hoa_file.read_text(),
+        "aps": aps,
+        "trace": trace,
+        "accepted": accepted,
+    }
+
+
+# This should just run from main.py
+if __name__ == "__main__":
+    if len(sys.argv) < 3:
+        logger.error("Usage: pipeline.py <spec.tlsf> <config.toml>")
+        sys.exit(1)
+
+    result = pipeline(sys.argv[1], sys.argv[2])
+    logger.info(result)

@@ -1,0 +1,16 @@
+[input]
+# Options: "random", "file", or "manual"
+type = "random"   # hoax will pick environment inputs at each step
+# path = "inputs.txt"  # if you want to force specific inputs
+
+[outputs]
+# System outputs are chosen automatically to stay consistent with the automaton
+mode = "auto"     # ensures only realizable outputs are produced
+
+[runner]
+# Limit trace length
+bound = 10
+
+[behavior]
+on_nondeterminism = "explore"  # explore all possible successors
+on_deadlock = "error"          # stop if the system cannot move

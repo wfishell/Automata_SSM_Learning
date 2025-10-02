@@ -1,0 +1,18 @@
+[hoax]
+name = "Random hoax config"
+version = 1
+default-driver = "flip"
+
+[[log]]
+# name is optional; if omitted the log goes to stdout
+level = "info"
+
+[[log]]
+name = "debug.log"
+level = "debug"
+
+[runner]
+# what to do in case of nondeterminism ("random", "user" or "first")
+nondet = "random"
+# Optional simulation bound (if not set, stop with Ctrl-C)
+bound = 500

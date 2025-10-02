@@ -1,0 +1,14 @@
+[input]
+type = "file"
+path = "inputs.txt"
+
+[outputs]
+mode = "auto"   # or "manual" if you want to also specify y0..y2 in the file
+
+[behavior]
+on_nondeterminism = "explore"
+on_deadlock = "error"
+
+[output]
+log_states = true
+stop_on_verdict = true

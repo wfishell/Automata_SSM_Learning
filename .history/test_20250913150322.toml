@@ -1,0 +1,22 @@
+# TOML config for hoax-hoa-executor
+
+[input]
+# Choose "file" if you want to provide a sequence of inputs
+# Each line in inputs.txt would look like: {x0, x2} meaning x0 and x2 true, others false
+type = "file"
+path = "./inputs.txt"
+
+[outputs]
+# Outputs are controllable: y0, y1, y2
+# You can either "manual" (user provides them) or "auto" (tool decides if realizable).
+mode = "auto"
+
+[behavior]
+# Policies for nondeterminism and deadlocks
+on_nondeterminism = "explore"   # explore all possible successors
+on_deadlock = "error"           # stop with error if no transitions
+
+[output]
+log_states = true
+log_verdicts = true
+stop_on_verdict = true

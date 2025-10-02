@@ -1,0 +1,52 @@
+INFO {
+    TITLE:       "Automatically translated (fixed partition)"
+    DESCRIPTION: "Inputs-only assumptions; output-related constraints in guarantees"
+    SEMANTICS:   Mealy
+    TARGET:      Mealy
+}
+
+MAIN {
+    INPUTS {
+      x0;
+      x1;
+      x2;
+      x3;
+    }
+    OUTPUTS {
+      y0;
+      y1;
+      y2;
+    }
+
+    ASSUMPTIONS {
+      G((x0 || x1 || x2 || x3) -> X(!x0 && !x1 && !x2 && !x3));
+
+      -- environment must at some point raise x0 alone
+      (x0 && !x1 && !x2 && !x3);
+
+      -- environment cannot keep x0 alone true forever
+      X(G(!(x0 && !x1 && !x2 && !x3)));
+    }
+
+    GUARANTEES {
+      -- outputs must be restricted when inputs are raised
+      G((X(x0 || x1 || x2 || x3)) -> (!y1 && !y2));
+
+      -- original guarantees
+      G((X(y0 || y1 || y2)) -> (x0 || x1 || x2 || x3 || y0 || y1 || y2));
+      G(((y0 || y1 || y2)) -> (!x0 && !x1 && !x2 && !x3));
+      G(((x0 || x1 || x2 || x3)) -> X(y0 || y1 || y2));
+      G(((y0 || y1 || y2)) -> ((!(!y0 && !y1 && !y2)) U ((!y1 && !y2 && y0))));
+      G((y0 && !y1 && !y2) -> X(!y0 && !y1 && !y2));
+
+      -- guarded cases depending on specific inputs
+      G((!x0 && !x1 && !x2 && x3) -> ((! (y0 && !y1 && !y2)) U (!y0 && y1 && !y2)));
+      G((!x0 && !x1 && !x2 && x3) -> ((! (y0 && !y1 && !y2)) U (y0 && y1 && !y2)));
+
+      G((!x0 && x1 && !x2 && !x3) -> ((! (y0 && !y1 && !y2)) U (!y0 && !y1 && y2)));
+      G((!x0 && x1 && !x2 && !x3) -> ((! (y0 && !y1 && !y2)) U (y0 && !y1 && y2)));
+
+      (x0 && !x1 && !x2 && !x3) -> ((! (y0 && !y1 && !y2)) U (!y0 && y1 && !y2));
+      (x0 && !x1 && !x2 && !x3) -> ((! (y0 && !y1 && !y2)) U (y0 && y1 && !y2)));
+    }
+}

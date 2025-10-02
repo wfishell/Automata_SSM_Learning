@@ -1,0 +1,18 @@
+[hoax]
+version = 1
+# you can also add "mode" here if needed, e.g. "monitor = false"
+
+[input]
+type = "file"
+path = "inputs.txt"
+
+[outputs]
+mode = "auto"
+
+[behavior]
+on_nondeterminism = "explore"
+on_deadlock = "error"
+
+[output]
+log_states = true
+stop_on_verdict = true

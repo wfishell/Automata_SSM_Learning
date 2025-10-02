@@ -1,0 +1,15 @@
+REALIZABLE
+HOA: v1
+States: 2
+Start: 0
+AP: 4 "g_0" "g_1" "r_0" "r_1"
+acc-name: all
+Acceptance: 0 t
+properties: trans-labels explicit-labels state-acc deterministic
+controllable-AP: 0 1
+--BODY--
+State: 0
+[0&!1] 1
+State: 1
+[!0&1] 0
+--END--

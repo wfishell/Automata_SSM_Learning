@@ -1,0 +1,51 @@
+(base) will@wmee2-629 Automata_SSM_Learning % hoax test.hoa --config test.toml
+╭─────────────────────────────────────────── Traceback (most recent call last) ────────────────────────────────────────────╮
+│ /opt/anaconda3/lib/python3.12/site-packages/hoax/main.py:54 in hoax                                                      │
+│                                                                                                                          │
+│   51 │   │   automata = list(exc.map(parse, files))                                                                      │
+│   52 │                                                                                                                   │
+│   53 │   conf = (                                                                                                        │
+│ ❱ 54 │   │   Configuration.factory(config, automata, monitor)                                                            │
+│   55 │   │   if config is not None                                                                                       │
+│   56 │   │   else DefaultConfig(automata, monitor))                                                                      │
+│   57                                                                                                                     │
+│                                                                                                                          │
+│ ╭──────────────────────────────────── locals ─────────────────────────────────────╮                                      │
+│ │ automata = [<hoax.hoa.Automaton object at 0x31bd8ffe0>]                         │                                      │
+│ │   config = PosixPath('test.toml')                                               │                                      │
+│ │      exc = <concurrent.futures.thread.ThreadPoolExecutor object at 0x319bb9760> │                                      │
+│ │    files = [PosixPath('test.hoa')]                                              │                                      │
+│ │  monitor = False                                                                │                                      │
+│ │    quiet = False                                                                │                                      │
+│ │  version = None                                                                 │                                      │
+│ ╰─────────────────────────────────────────────────────────────────────────────────╯                                      │
+│                                                                                                                          │
+│ /opt/anaconda3/lib/python3.12/site-packages/hoax/config/config.py:71 in factory                                          │
+│                                                                                                                          │
+│    68 │   │   │   │   else:                                                                                              │
+│    69 │   │   │   │   │   raise ConfigurationError(f"Unsupported version {conf_version}")  # n                           │
+│    70 │   │   │   except (AssertionError, tomli.TOMLDecodeError, msgspec.ValidationError) as e                           │
+│ ❱  71 │   │   │   │   raise ConfigurationError(err) from None                                                            │
+│    72                                                                                                                    │
+│    73                                                                                                                    │
+│    74 class DefaultConfig(Configuration):                                                                                │
+│                                                                                                                          │
+│ ╭─────────────────────────────────────────── locals ────────────────────────────────────────────╮                        │
+│ │         a = [<hoax.hoa.Automaton object at 0x31bd8ffe0>]                                      │                        │
+│ │ conf_file = <_io.BufferedReader name='test.toml'>                                             │                        │
+│ │     fname = PosixPath('test.toml')                                                            │                        │
+│ │   monitor = False                                                                             │                        │
+│ │      toml = {                                                                                 │                        │
+│ │             │   'input': {'type': 'file', 'path': './input.txt'},                             │                        │
+│ │             │   'outputs': {'mode': 'auto'},                                                  │                        │
+│ │             │   'behavior': {'on_nondeterminism': 'explore', 'on_deadlock': 'error'},         │                        │
+│ │             │   'output': {                                                                   │                        │
+│ │             │   │   'log_states': True,                                                       │                        │
+│ │             │   │   'log_verdicts': True,                                                     │                        │
+│ │             │   │   'stop_on_verdict': True                                                   │                        │
+│ │             │   }                                                                             │                        │
+│ │             }                                                                                 │                        │
+│ ╰───────────────────────────────────────────────────────────────────────────────────────────────╯                        │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+ConfigurationError: Missing mandatory section [hoax]
+(base) will@wmee2-629 Automata_SSM_Learning % 

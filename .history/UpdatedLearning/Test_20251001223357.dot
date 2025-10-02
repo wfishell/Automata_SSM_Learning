@@ -1,0 +1,15 @@
+digraph "" {
+  rankdir=LR
+  node [shape="circle"]
+  I [label="", style=invis, width=0]
+  I -> 1
+  0 [label="0"]
+  0 -> 0 [label="1 / acc"]
+  1 [label="1"]
+  1 -> 1 [label="!q / !acc"]
+  1 -> 2 [label="q / !acc"]
+  2 [label="2"]
+  2 -> 0 [label="r / 1"]
+  2 -> 1 [label="!p & !q & !r / !acc"]
+  2 -> 2 [label="(q & !r) | (p & !r) / !acc"]
+}

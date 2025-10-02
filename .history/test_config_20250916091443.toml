@@ -1,0 +1,21 @@
+[hoax]
+name = "Random trace generator"
+version = 1
+default-driver = "flip"
+
+[input]
+type = "random"
+
+[outputs]
+mode = "auto"
+
+[runner]
+bound = 10
+
+[behavior]
+on_nondeterminism = "explore"
+on_deadlock = "error"
+
+[[driver.txt]]
+aps = ["cancel", "go"]
+filename = "file.txt"

@@ -1,0 +1,17 @@
+
+HOA: v1
+States: 3
+Start: 0
+AP: 6 "g_2" "g_0" "g_1" "r_0" "r_1" "r_2"
+acc-name: all
+Acceptance: 0 t
+properties: trans-labels explicit-labels state-acc deterministic
+controllable-AP: 0 1 2
+--BODY--
+State: 0
+[0&!1&!2] 1
+State: 1
+[!0&1&!2] 2
+State: 2
+[!0&!1&2] 0
+--END--

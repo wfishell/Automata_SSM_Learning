@@ -1,0 +1,21 @@
+cancel
+go
+
+cancel
+
+go
+
+go
+
+go
+
+cancel
+
+<empty line for set()>
+
+cancel
+go
+
+cancel
+
+go
