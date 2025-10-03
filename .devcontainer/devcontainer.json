@@ -1,0 +1,49 @@
+{
+    "name": "Automata_SSM_Learning",
+    "image": "wfishell1/ssm_automata_learning:latest",
+    "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+
+    "features": {
+      "ghcr.io/devcontainers/features/github-cli:1": {}
+    },
+
+    "forwardPorts": [8888, 5000],
+
+    "customizations": {
+      "vscode": {
+        "settings": {
+          "python.defaultInterpreterPath": "/usr/bin/python3",
+          "python.formatting.provider": "black",
+          "editor.formatOnSave": true,
+          "python.formatting.blackArgs": ["--line-length=88"],
+          "python.sortImports.args": ["--profile", "black", "--line-length", "88"],
+          "python.linting.enabled": true,
+          "python.linting.flake8Enabled": true,
+          "python.linting.flake8Args": ["--max-line-length=88", "--extend-ignore=E203,W503"],
+          "terminal.integrated.defaultProfile.linux": "zsh"
+        },
+        "extensions": [
+          "ms-python.python",
+          "ms-python.debugpy",
+          "ms-python.black-formatter",
+          "ms-python.isort",
+          "github.vscode-pull-request-github",
+          "vscodevim.vim",
+          "docker.docker",
+          "ms-azuretools.vscode-docker",
+          "rogalmic.bash-debug",
+          "anthropic.claude-code",
+          "eamodio.gitlens",
+          "visualstudioexptteam.vscodeintellicode",
+          "yzhang.markdown-all-in-one",
+          "foxundermoon.shell-format",
+          "redhat.vscode-yaml",
+          "tamasfe.even-better-toml"
+        ]
+      }
+    },
+
+    "overrideCommand": true,
+
+    "postCreateCommand": "pip install --no-cache-dir pre-commit && pre-commit install"
+  }
