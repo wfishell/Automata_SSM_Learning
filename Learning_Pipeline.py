@@ -47,7 +47,7 @@ def GenerateTraces(
     subprocess.run(
         [
             "python",
-            "dot_trace_generator.py",
+            "Dot_Trace_Generator.py",
             dot_file,
             "--fmt",
             "dot",
@@ -68,7 +68,7 @@ def GenerateTraces(
 def CheckTraces(hoa_file, data_file):
     """Run Trace_Checker and parse acceptance percentage from stdout."""
     result = subprocess.run(
-        ["python", "trace_checker.py", hoa_file, data_file],
+        ["python", "Trace_Checker.py", hoa_file, data_file],
         capture_output=True,
         text=True,
         check=True,
@@ -83,7 +83,7 @@ def CheckTraces(hoa_file, data_file):
 
 def PassiveLearning(data_file, inputs, outputs):
     subprocess.run(
-        ["python", "passive_mealy_learning.py", data_file, inputs, outputs], check=True
+        ["python", "Passive_Mealy_Learning.py", data_file, inputs, outputs], check=True
     )
 
     subprocess.run(
@@ -162,7 +162,7 @@ def ActiveLearning(tlsf_file):
 
 
 if __name__ == "__main__":
-    directory = "/Users/will/github/Automata_SSM_Learning/testset/syntcompbenchmarks/"
+    directory = "TestSet/SyntCompBenchMarks"
 
     # sweep settings
     trace_lengths = [10]  # keep length fixed
