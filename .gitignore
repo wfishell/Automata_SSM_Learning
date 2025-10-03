@@ -37,3 +37,7 @@ htmlcov/
 *.dot
 *.tlsf
 *.txt
+#flake ignore
+.flake8
+#history ignore
+./history
