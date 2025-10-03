@@ -4,42 +4,105 @@ from mamba_ssm import Mamba
 
 
 class FSM_Mamba(nn.Module):
-    def __init__(self, input_dim, output_dim, d_model=64, n_layers=2):
+    def __init__(self, input_dim, output_dim, d_model=128, n_layers=2):
         super().__init__()
         self.input_dim = input_dim
         self.output_dim = output_dim
+        self.d_model = d_model
 
-        # Embed concatenated [inputs + previous outputs]
-        self.embed = nn.Linear(input_dim + output_dim, d_model)
-        self.mamba = Mamba(d_model=d_model, n_layers=n_layers)
-        self.head = nn.Linear(d_model, output_dim)
+        self.embed = nn.Linear(input_dim, d_model)
+        self.layers = nn.ModuleList(
+            [
+                Mamba(d_model=d_model, d_state=16, d_conv=4, expand=2)
+                for _ in range(n_layers)
+            ]
+        )
+        self.fc = nn.Linear(d_model, output_dim)
+        self.activation = nn.Sigmoid()  # since output is binary
 
-    def forward(self, inputs, outputs=None, autoregressive=False):
-        """
-        inputs: [B, T, input_dim]
-        outputs: [B, T, output_dim] (optional for teacher forcing)
-        autoregressive: if True, roll forward using own predictions
+        # Store hidden states for stateful processing
+        self.hidden_states = None
+
+    def reset_hidden(self, batch_size=1):
+        """Reset hidden states for new sequence processing."""
+        self.hidden_states = None
+
+    def forward(self, inputs, autoregressive=False):
+        """Forward pass that maintains state across timesteps.
+
+        Args:
+            inputs: (B, T, input_dim) - Input sequences
+            autoregressive: bool - Whether to use autoregressive mode (for compatibility)
+
+        Returns:
+            outputs: (B, T, output_dim) - Predicted outputs
         """
         B, T, _ = inputs.shape
-        preds = []
-        prev_y = torch.zeros(B, 1, self.output_dim, device=inputs.device)
+        device = inputs.device
 
+        # Initialize outputs
+        outputs = []
+
+        # Initialize hidden state if needed
+        if self.hidden_states is None:
+            h = torch.zeros(B, 1, self.d_model).to(device)
+        else:
+            h = self.hidden_states
+
+        # Process sequence step by step
         for t in range(T):
-            x_t = inputs[:, t : t + 1, :]
+            # Get current input
+            x_t = inputs[:, t : t + 1, :]  # (B, 1, input_dim)
 
-            if outputs is not None and not autoregressive:
-                # Teacher forcing: feed in true outputs
-                y_t_in = outputs[:, t : t + 1, :]
-            else:
-                # Inference: feed in last prediction
-                y_t_in = prev_y
+            # Embed input
+            x_t = self.embed(x_t)  # (B, 1, d_model)
 
-            inp = torch.cat([x_t, y_t_in], dim=-1)  # [B,1,input_dim+output_dim]
-            z = self.embed(inp)
-            h = self.mamba(z)
-            y_hat = torch.sigmoid(self.head(h))  # [B,1,output_dim] in [0,1]
+            # Process through Mamba layers with hidden state
+            for layer in self.layers:
+                # Mamba maintains its own internal state
+                x_t = layer(x_t)
 
-            preds.append(y_hat)
-            prev_y = y_hat.detach()  # feedback
+            # Update hidden state
+            h = x_t
 
-        return torch.cat(preds, dim=1)  # [B,T,output_dim]
+            # Predict output for this timestep
+            y_t = self.activation(self.fc(x_t[:, -1, :]))  # (B, output_dim)
+            outputs.append(y_t.unsqueeze(1))  # (B, 1, output_dim)
+
+        # Store final hidden state for potential continued processing
+        self.hidden_states = h
+
+        return torch.cat(outputs, dim=1)  # (B, T, output_dim)
+
+    def forward_step(self, input_t, hidden=None):
+        """Single step forward for true autoregressive/online prediction.
+
+        Args:
+            input_t: (B, input_dim) - Single timestep input
+            hidden: Optional hidden state from previous step
+
+        Returns:
+            output_t: (B, output_dim) - Single timestep output
+            hidden: Updated hidden state
+        """
+        B = input_t.shape[0]
+        device = input_t.device
+
+        # Initialize hidden if needed
+        if hidden is None:
+            hidden = torch.zeros(B, 1, self.d_model).to(device)
+
+        # Add time dimension
+        x_t = input_t.unsqueeze(1)  # (B, 1, input_dim)
+
+        # Embed
+        x_t = self.embed(x_t)
+
+        # Process through layers
+        for layer in self.layers:
+            x_t = layer(x_t)
+
+        # Get output
+        output_t = self.activation(self.fc(x_t[:, -1, :]))
+
+        return output_t, x_t
