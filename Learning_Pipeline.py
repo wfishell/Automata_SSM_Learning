@@ -134,11 +134,17 @@ def ActiveLearning(tlsf_file):
         .strip()
     )
 
+    subprocess.run(
+        f"ltlsynt --hide-status --tlsf {tlsf_file} --dot > System.dot",
+        shell=True,
+        check=True,
+    )
+
     result = subprocess.run(
         [
             "python",
             "active_learning.py",
-            "controller.dot",
+            "System.dot",
             "--inputs",
             inputs,
             "--outputs",
@@ -150,23 +156,69 @@ def ActiveLearning(tlsf_file):
         ],
         capture_output=True,
         text=True,
-        check=True,
     )
-    print("STDOUT:\n", result.stdout)
-    print("STDERR:\n", result.stderr)
-    subprocess.run(
-        "autfilt controller_learned.hoa --dot > controller_learned.dot",
-        shell=True,
-        check=True,
-    )
+
+    if result.returncode != 0:
+        print("ERROR: active_learning.py failed")
+        print(f"STDERR: {result.stderr}")
+        return None
+
+    # Extract membership queries from the learning algorithm section
+    queries_learning = None
+    queries_eq = None
+
+    for line in result.stdout.splitlines():
+        if "# Membership Queries" in line and queries_learning is None:
+            # First occurrence is from Learning Algorithm section
+            queries_learning = int(line.split(":")[-1].strip())
+        elif "# Membership Queries" in line and queries_learning is not None:
+            # Second occurrence is from Equivalence Query section
+            queries_eq = int(line.split(":")[-1].strip())
+            break
+
+    if queries_learning is not None and queries_eq is not None:
+        queries_total = queries_learning + queries_eq
+        print(
+            f"Queries - Learning: {queries_learning}, EQ: {queries_eq}, Total: {queries_total}"
+        )
+        return queries_total
+    else:
+        print("Could not extract query counts")
+        return None
 
 
 if __name__ == "__main__":
-    directory = "TestSet/SyntCompBenchMarks"
+    directory = "./TestSet/SyntCompBenchMarks"
+
+    # Initialize results list
+    results = []
+
+    for file in os.listdir(directory):
+        if not file.endswith(".tlsf"):
+            continue
+
+        full_path = os.path.join(directory, file)
+        print(f"\n[+] Processing: {file}")
+
+        queries = ActiveLearning(full_path)
+
+        results.append({"file": file, "queries_total": queries})
+
+        print(f"[✓] {file}: {queries} queries\n")
+
+    # Create DataFrame
+    df = pd.DataFrame(results)
+
+    # Save to CSV
+    output_csv = "active_learning_results.csv"
+    df.to_csv(output_csv, index=False)
+
+    print(f"Results saved to: {output_csv}")
+    print(df)
 
     # sweep settings
     trace_lengths = [10]  # keep length fixed
-    trace_counts = [5, 10, 20, 50, 100]  # vary num_traces
+    trace_counts = [20, 50, 100]  # vary num_traces
 
     csv_path = "pipeline_results.csv"
 

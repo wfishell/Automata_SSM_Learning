@@ -1,3 +1,5 @@
+import sys
+
 import torch
 import torch.nn as nn
 
@@ -8,8 +10,12 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print("Using device:", device)
 
 # DYNAMIC CONFIGURATION - CHANGE THESE AS NEEDED
-INPUT_APS = ["a", "b"]  # Can add more: ["go", "cancel", "req", "start", "stop"]
-OUTPUT_APS = ["p0", "p1"]
+INPUT_APS = sys.argv[1].split(",")
+OUTPUT_APS = sys.argv[2].split(",")
+print(INPUT_APS)
+print(OUTPUT_APS)
+# INPUT_APS = ["a", "b"]  # Can add more: ["go", "cancel", "req", "start", "stop"]
+# OUTPUT_APS = ["p0", "p1"]
 
 # Load datasets with dynamic inputs/outputs
 X_train, Y_train, X_test, Y_test = prepare_datasets(
