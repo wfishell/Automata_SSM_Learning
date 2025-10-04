@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-"""
-Convert SPOT-generated automata (from TLSF) to AALpy-compatible oracles for active learning,
-learn a Mealy machine, and export both oracle and learned automata to HOA.
+"""Convert SPOT-generated automata (from TLSF) to AALpy-compatible oracles for active
+learning, learn a Mealy machine, and export both oracle and learned automata to HOA.
 
 Usage:
     python spot_to_aalpy.py input.dot [--inputs a,b] [--outputs p0,p1] [algorithm] [eq_oracle]
@@ -16,7 +15,6 @@ Args:
 import argparse
 import os
 import re
-import sys
 from collections import defaultdict
 from itertools import product
 from typing import Any, Dict, List, Optional
@@ -32,8 +30,8 @@ from aalpy.utils import save_automaton_to_file, visualize_automaton
 
 
 class SpotAutomatonOracle(SUL):
-    """
-    Oracle wrapper for SPOT-generated automaton.
+    """Oracle wrapper for SPOT-generated automaton.
+
     Implements AALpy's SUL (System Under Learning) interface.
     """
 
@@ -139,7 +137,8 @@ class SpotAutomatonOracle(SUL):
         return sorted(props)
 
     def _generate_input_alphabet(self) -> List[str]:
-        """Generate input alphabet as binary encodings of input proposition valuations."""
+        """Generate input alphabet as binary encodings of input proposition
+        valuations."""
         n = len(self.input_props)
         if n > 12:
             print(f"Warning: input alphabet has {2**n} symbols (may be slow)")
@@ -150,7 +149,8 @@ class SpotAutomatonOracle(SUL):
         return alphabet
 
     def _build_transition_map(self) -> Dict[tuple, tuple]:
-        """Pre-compute transition map for all state-input pairs, returning (next_state, output)."""
+        """Pre-compute transition map for all state-input pairs, returning (next_state,
+        output)."""
         trans_map = {}
         for state in self.automaton["states"]:
             for symbol in self.alphabet:
@@ -181,7 +181,8 @@ class SpotAutomatonOracle(SUL):
     def _find_valid_transitions(
         self, state: str, input_valuation: Dict[str, bool]
     ) -> List[tuple]:
-        """Find all valid transitions from state with given input, checking output conditions."""
+        """Find all valid transitions from state with given input, checking output
+        conditions."""
         valid = []
 
         for trans in self.automaton["transitions"].get(state, []):
@@ -310,7 +311,7 @@ def learn_automaton_from_spot(
         f"\nStarting {learning_algorithm.upper()} learning with {eq_oracle_type} equivalence oracle..."
     )
     if learning_algorithm == "lstar":
-        learned = run_Lstar(
+        learned, stats = run_Lstar(
             alphabet=oracle.alphabet,
             sul=oracle,
             eq_oracle=eq_oracle,
@@ -318,18 +319,21 @@ def learn_automaton_from_spot(
             max_learning_rounds=max_rounds,
             print_level=2,
             cache_and_non_det_check=True,
+            return_data=True,
         )
     elif learning_algorithm == "kv":
         from aalpy.learning_algs import run_KV
 
-        learned = run_KV(
+        learned, stats = run_KV(
             alphabet=oracle.alphabet,
             sul=oracle,
             eq_oracle=eq_oracle,
             automaton_type="mealy",
             max_learning_rounds=max_rounds,
             print_level=2,
+            return_data=True,
         )
+
     else:
         raise ValueError(f"Unknown learning algorithm: {learning_algorithm}")
 
@@ -339,7 +343,7 @@ def learn_automaton_from_spot(
         )
         print("Try: increase random_walk steps, or use w_method if alphabet is small.")
 
-    return learned, oracle
+    return learned, oracle, stats
 
 
 def compare_automata(
@@ -413,8 +417,8 @@ def compare_automata(
 def _cond_to_hoa(
     condition: str, propositions: List[str], use_indices: bool = True
 ) -> str:
-    """
-    Convert a SPOT-style boolean condition over named APs into HOA label syntax.
+    """Convert a SPOT-style boolean condition over named APs into HOA label syntax.
+
     - If use_indices=True, map AP names to numeric indices 0..n-1 (Spot prefers this).
     - Keep !, &, |, ( ), and constants t/f.
     """
@@ -431,8 +435,8 @@ def _cond_to_hoa(
 
 
 def export_spot_oracle_to_hoa(oracle: SpotAutomatonOracle, out_path: str):
-    """
-    Export the parsed SPOT automaton (transition-based acceptance) to HOA v1.
+    """Export the parsed SPOT automaton (transition-based acceptance) to HOA v1.
+
     Preserves acceptance sets found on transitions. Uses numeric AP indices.
     """
     auto = oracle.automaton
@@ -506,8 +510,8 @@ def export_learned_mealy_to_hoa(
     label_as_indices: bool = True,
     require_deterministic: bool = True,
 ):
-    """
-    Export learned Mealy to HOA with both inputs and outputs as atomic propositions.
+    """Export learned Mealy to HOA with both inputs and outputs as atomic propositions.
+
     The transition labels will include both input conditions and output values.
     """
     # Include both inputs and outputs as APs
@@ -646,11 +650,15 @@ def main():
     print(f"Output propositions: {output_props}")
 
     # Learn automaton
-    learned, oracle = learn_automaton_from_spot(
+    learned, oracle, stats = learn_automaton_from_spot(
         args.dot_file, input_props, output_props, args.algorithm, args.eq
     )
 
-    print(f"\n=== Learning Complete ===")
+    queries_total = stats["queries_learning"] + stats["queries_eq_oracle"]
+    print(
+        f"Membership queries: {stats['queries_learning']} + {stats['queries_eq_oracle']} = {queries_total}"
+    )
+
     print(f"Oracle states: {len(oracle.automaton['states'])}")
     print(f"Learned states: {len(learned.states)}")
 
