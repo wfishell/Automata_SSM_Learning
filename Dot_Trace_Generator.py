@@ -93,7 +93,7 @@ def step_to_spot(step, ap_order):
         if ap in literals:
             val = literals[ap]
         else:
-            val = random.choice([0, 1])  # randomize unmentioned APs
+            val = 0  # randomize unmentioned APs
         bits.append(ap if val else f"!{ap}")
     return "&".join(bits)
 
