@@ -667,9 +667,9 @@ def main():
     save_automaton_to_file(learned, learned_dot)
     print(f"Learned automaton saved to: {learned_dot}")
 
-    # Save oracle HOA next to the input DOT (preserves acceptance, numeric labels)
-    oracle_hoa = args.dot_file.replace(".dot", ".hoa")
-    export_spot_oracle_to_hoa(oracle, oracle_hoa)
+    # DELETE these two lines:
+    # oracle_hoa = args.dot_file.replace(".dot", ".hoa")
+    # export_spot_oracle_to_hoa(oracle, oracle_hoa)
 
     # Save learned HOA
     learned_hoa = args.dot_file.replace(".dot", "_learned.hoa")
@@ -685,7 +685,7 @@ def main():
     )
 
     # Optional: Compare accuracy on random tests for small machines
-    if len(oracle.automaton["states"]) <= 10:
+    if len(oracle.automaton["states"]) <= 100:
         compare_automata(learned, oracle)
 
     # Optional: Visualize (requires graphviz)

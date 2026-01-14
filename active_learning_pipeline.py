@@ -9,8 +9,8 @@ from multiprocessing import Pool
 import pandas as pd
 
 # Timeout in seconds for active learning
-ACTIVE_LEARNING_TIMEOUT = 120  # 2 minutes
-NUM_WORKERS = 2  # Number of parallel workers
+ACTIVE_LEARNING_TIMEOUT = 30  # 2 minutes
+NUM_WORKERS = 16  # Number of parallel workers
 
 # Store the directory where the script is run from (where active_learning.py etc. live)
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -348,7 +348,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--benchmark-dir",
         "-d",
-        default="/workspaces/Automata_SSM_Learning/TestSet/SyntCompBenchMarks",
+        default="/workspaces/Automata_SSM_Learning/TestSet/benchmarks/tlsf",
         help="Directory containing TLSF files (searched recursively)",
     )
     parser.add_argument(

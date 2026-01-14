@@ -38,8 +38,6 @@ def main():
         is_ok = check_trace(hoa_file, trace)
         if is_ok:
             accepted += 1
-        status = "ACCEPTED ✅" if is_ok else "REJECTED ❌"
-        print(f"[{i}/{total}] {status}: {trace}")
 
     print("\n=== Summary ===")
     print(f"Total traces: {total}")

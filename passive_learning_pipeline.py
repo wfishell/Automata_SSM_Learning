@@ -19,8 +19,8 @@ import pandas as pd
 
 
 def SynthesizeMealy(file_path):
-    """Synthesize a Mealy machine from a TLSF specification."""
-    inputs = (
+    # Get input/output signal NAMES from syfco (to know which are inputs vs outputs)
+    input_names = set(
         subprocess.run(
             ["syfco", "--print-input-signals", file_path],
             capture_output=True,
@@ -29,9 +29,10 @@ def SynthesizeMealy(file_path):
         )
         .stdout.replace(" ", "")
         .strip()
+        .split(",")
     )
 
-    outputs = (
+    output_names = set(
         subprocess.run(
             ["syfco", "--print-output-signals", file_path],
             capture_output=True,
@@ -40,20 +41,40 @@ def SynthesizeMealy(file_path):
         )
         .stdout.replace(" ", "")
         .strip()
+        .split(",")
     )
 
-    APs = ",".join([inputs, outputs]) if outputs else inputs
-
     subprocess.run(
-        f"ltlsynt --hide-status --tlsf {file_path} > System.hoa",
+        f"ltlsynt --hide-status --tlsf {file_path} > System.hoa", shell=True, check=True
+    )
+    subprocess.run(
+        "autfilt System.hoa --dot > System.dot",
         shell=True,
         check=True,
     )
-    subprocess.run(
-        f"ltlsynt --hide-status --tlsf {file_path} --dot > System.dot",
+
+    # Extract AP names FROM THE HOA FILE (preserves actual casing)
+    ap_line = subprocess.run(
+        'grep "^AP:" System.hoa',
         shell=True,
         check=True,
-    )
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+
+    # Parse: AP: 5 "finished_0" "finished_1" ... -> list of names
+    ap_names = re.findall(r'"([^"]+)"', ap_line)
+
+    # Match against input/output names (case-insensitive)
+    input_names_lower = {n.lower() for n in input_names}
+    output_names_lower = {n.lower() for n in output_names}
+
+    actual_inputs = [ap for ap in ap_names if ap.lower() in input_names_lower]
+    actual_outputs = [ap for ap in ap_names if ap.lower() in output_names_lower]
+
+    inputs = ",".join(actual_inputs)
+    outputs = ",".join(actual_outputs)
+    APs = ",".join(ap_names)
 
     return APs, inputs, outputs
 
@@ -118,8 +139,8 @@ def PassiveLearningWithConvergence(
     tlsf_file,
     start_traces=5000,
     step_traces=5000,
-    max_traces=100000,
-    target_accuracy=50.0,
+    max_traces=50000,
+    target_accuracy=100.0,
     trace_length=20,
     test_traces=1000,
 ):
@@ -205,7 +226,6 @@ def run_single_experiment(
         return {
             "num_traces": final_traces,
             "accuracy": final_acc,
-            "sample_size": final_traces * trace_length if final_traces else None,
             "converged": (
                 final_acc >= target_accuracy if final_acc is not None else False
             ),
@@ -376,8 +396,8 @@ if __name__ == "__main__":
         output_csv=output_csv,
         start_traces=5000,
         step_traces=5000,
-        max_traces=100000,
-        target_accuracy=50.0,
+        max_traces=50000,
+        target_accuracy=100.0,
         trace_length=20,
         test_traces=1000,
     )
