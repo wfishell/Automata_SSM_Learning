@@ -1,0 +1,1 @@
+{"tlsf_file": "benchmarks/tlsf/ltl2dpa/ltl2dpa15.tlsf", "trial": 1, "results": [], "status": "error", "error": "Command '['python', '/var/task/Dot_Trace_Generator.py', '/tmp/tmpvt2vrvlt/System.dot', '--fmt', 'dot', '--aps', 'p0,a,b,p1', '-n', '5000', '-l', '20', '--cycle', '--out', '/tmp/tmpvt2vrvlt/Training_5000.txt']' returned non-zero exit status 1."}

@@ -1,0 +1,1 @@
+{"tlsf_file": "benchmarks/tlsf/ltl_f/generated_TLSF/finding_nemo_pb_4_pe_.tlsf", "trial": 1, "trace_length": 20, "results": [{"num_traces": 5000, "sample_size": 100000, "accuracy": 100.0}], "final_accuracy": 100.0, "final_traces": 5000, "status": "success"}
