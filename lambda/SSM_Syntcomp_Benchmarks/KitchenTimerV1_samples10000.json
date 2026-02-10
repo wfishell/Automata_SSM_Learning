@@ -1,0 +1,47 @@
+{
+  "file": "/workspaces/Automata_SSM_Learning/TestSet/benchmarks/tlsf_3/tsl_paper/KitchenTimerV1.tlsf",
+  "training_samples": 10000,
+  "error": null,
+  "converged_epoch": 500,
+  "sample_complexity": 5000000,
+  "test_trace_acc": 1.0,
+  "acceptance": 100.0,
+  "epoch_history": [
+    {
+      "epoch": 0,
+      "loss": 0.6958,
+      "test_step_acc": 0.0,
+      "test_trace_acc": 0.0
+    },
+    {
+      "epoch": 100,
+      "loss": 0.341,
+      "test_step_acc": 0.3762,
+      "test_trace_acc": 0.0
+    },
+    {
+      "epoch": 200,
+      "loss": 0.2361,
+      "test_step_acc": 0.6438,
+      "test_trace_acc": 0.0
+    },
+    {
+      "epoch": 300,
+      "loss": 0.1316,
+      "test_step_acc": 0.7131,
+      "test_trace_acc": 0.0
+    },
+    {
+      "epoch": 400,
+      "loss": 0.0752,
+      "test_step_acc": 0.9912,
+      "test_trace_acc": 0.841
+    },
+    {
+      "epoch": 500,
+      "loss": 0.0465,
+      "test_step_acc": 1.0,
+      "test_trace_acc": 1.0
+    }
+  ]
+}

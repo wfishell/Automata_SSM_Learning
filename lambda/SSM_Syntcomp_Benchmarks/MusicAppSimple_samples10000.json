@@ -1,0 +1,71 @@
+{
+  "file": "/workspaces/Automata_SSM_Learning/TestSet/benchmarks/tlsf_3/tsl_paper/MusicAppSimple.tlsf",
+  "training_samples": 10000,
+  "error": null,
+  "converged_epoch": 1000,
+  "sample_complexity": 10000000,
+  "test_trace_acc": 0.03,
+  "acceptance": 3.0,
+  "epoch_history": [
+    {
+      "epoch": 0,
+      "loss": 0.6903,
+      "test_step_acc": 0.3514,
+      "test_trace_acc": 0.0
+    },
+    {
+      "epoch": 100,
+      "loss": 0.3999,
+      "test_step_acc": 0.425,
+      "test_trace_acc": 0.0
+    },
+    {
+      "epoch": 200,
+      "loss": 0.252,
+      "test_step_acc": 0.7109,
+      "test_trace_acc": 0.001
+    },
+    {
+      "epoch": 300,
+      "loss": 0.1804,
+      "test_step_acc": 0.8166,
+      "test_trace_acc": 0.023
+    },
+    {
+      "epoch": 400,
+      "loss": 0.1508,
+      "test_step_acc": 0.8349,
+      "test_trace_acc": 0.039
+    },
+    {
+      "epoch": 500,
+      "loss": 0.136,
+      "test_step_acc": 0.8358,
+      "test_trace_acc": 0.036
+    },
+    {
+      "epoch": 600,
+      "loss": 0.1273,
+      "test_step_acc": 0.8371,
+      "test_trace_acc": 0.037
+    },
+    {
+      "epoch": 700,
+      "loss": 0.1221,
+      "test_step_acc": 0.8385,
+      "test_trace_acc": 0.036
+    },
+    {
+      "epoch": 800,
+      "loss": 0.1191,
+      "test_step_acc": 0.8384,
+      "test_trace_acc": 0.029
+    },
+    {
+      "epoch": 900,
+      "loss": 0.1173,
+      "test_step_acc": 0.8387,
+      "test_trace_acc": 0.03
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "file": "/workspaces/Automata_SSM_Learning/TestSet/benchmarks/tlsf/ltl2dpa/ltl2dpa04.tlsf",
+  "training_samples": 10000,
+  "error": null,
+  "converged_epoch": 400,
+  "sample_complexity": 4000000,
+  "test_trace_acc": 1.0,
+  "acceptance": 0.0,
+  "epoch_history": [
+    {
+      "epoch": 0,
+      "loss": 0.678,
+      "test_step_acc": 0.05,
+      "test_trace_acc": 0.0
+    },
+    {
+      "epoch": 100,
+      "loss": 0.1235,
+      "test_step_acc": 0.9476,
+      "test_trace_acc": 0.644
+    },
+    {
+      "epoch": 200,
+      "loss": 0.0557,
+      "test_step_acc": 0.9858,
+      "test_trace_acc": 0.898
+    },
+    {
+      "epoch": 300,
+      "loss": 0.0205,
+      "test_step_acc": 0.9997,
+      "test_trace_acc": 0.996
+    },
+    {
+      "epoch": 400,
+      "loss": 0.0107,
+      "test_step_acc": 1.0,
+      "test_trace_acc": 1.0
+    }
+  ]
+}

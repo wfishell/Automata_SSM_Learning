@@ -1,0 +1,17 @@
+{
+  "file": "/workspaces/Automata_SSM_Learning/TestSet/benchmarks/tlsf_4/ordered-visits-choice-real.tlsf",
+  "training_samples": 10000,
+  "error": null,
+  "converged_epoch": 0,
+  "sample_complexity": 0,
+  "test_trace_acc": 1.0,
+  "acceptance": 100.0,
+  "epoch_history": [
+    {
+      "epoch": 0,
+      "loss": 0.6395,
+      "test_step_acc": 1.0,
+      "test_trace_acc": 1.0
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "file": "/workspaces/Automata_SSM_Learning/TestSet/benchmarks/tlsf/parametric/arbiter_on_inpchange.tlsf",
+  "training_samples": 10000,
+  "error": null,
+  "converged_epoch": 500,
+  "sample_complexity": 5000000,
+  "test_trace_acc": 1.0,
+  "acceptance": 100.0,
+  "epoch_history": [
+    {
+      "epoch": 0,
+      "loss": 0.7337,
+      "test_step_acc": 0.2408,
+      "test_trace_acc": 0.0
+    },
+    {
+      "epoch": 100,
+      "loss": 0.5542,
+      "test_step_acc": 0.7592,
+      "test_trace_acc": 0.0
+    },
+    {
+      "epoch": 200,
+      "loss": 0.5363,
+      "test_step_acc": 0.7592,
+      "test_trace_acc": 0.0
+    },
+    {
+      "epoch": 300,
+      "loss": 0.5228,
+      "test_step_acc": 0.7593,
+      "test_trace_acc": 0.0
+    },
+    {
+      "epoch": 400,
+      "loss": 0.2436,
+      "test_step_acc": 0.9123,
+      "test_trace_acc": 0.201
+    },
+    {
+      "epoch": 500,
+      "loss": 0.0306,
+      "test_step_acc": 1.0,
+      "test_trace_acc": 1.0
+    }
+  ]
+}

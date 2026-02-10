@@ -1,0 +1,23 @@
+{
+  "file": "/workspaces/Automata_SSM_Learning/TestSet/benchmarks/tlsf_2/sweap/robot-tasks-real.tlsf",
+  "training_samples": 10000,
+  "error": null,
+  "converged_epoch": 100,
+  "sample_complexity": 1000000,
+  "test_trace_acc": 1.0,
+  "acceptance": 100.0,
+  "epoch_history": [
+    {
+      "epoch": 0,
+      "loss": 0.7056,
+      "test_step_acc": 0.001,
+      "test_trace_acc": 0.0
+    },
+    {
+      "epoch": 100,
+      "loss": 0.0111,
+      "test_step_acc": 1.0,
+      "test_trace_acc": 1.0
+    }
+  ]
+}

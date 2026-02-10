@@ -1,0 +1,29 @@
+{
+  "file": "/workspaces/Automata_SSM_Learning/TestSet/benchmarks/tlsf/parametric/arbiter_with_cancel.tlsf",
+  "training_samples": 10000,
+  "error": null,
+  "converged_epoch": 200,
+  "sample_complexity": 2000000,
+  "test_trace_acc": 1.0,
+  "acceptance": 100.0,
+  "epoch_history": [
+    {
+      "epoch": 0,
+      "loss": 0.6576,
+      "test_step_acc": 0.836,
+      "test_trace_acc": 0.017
+    },
+    {
+      "epoch": 100,
+      "loss": 0.3706,
+      "test_step_acc": 0.836,
+      "test_trace_acc": 0.017
+    },
+    {
+      "epoch": 200,
+      "loss": 0.0461,
+      "test_step_acc": 1.0,
+      "test_trace_acc": 1.0
+    }
+  ]
+}

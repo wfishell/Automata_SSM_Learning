@@ -1,0 +1,47 @@
+{
+  "file": "/workspaces/Automata_SSM_Learning/TestSet/benchmarks/tlsf/arbiters_s4/parametric/example10a.tlsf",
+  "training_samples": 10000,
+  "error": null,
+  "converged_epoch": 500,
+  "sample_complexity": 5000000,
+  "test_trace_acc": 1.0,
+  "acceptance": 100.0,
+  "epoch_history": [
+    {
+      "epoch": 0,
+      "loss": 0.6925,
+      "test_step_acc": 0.6423,
+      "test_trace_acc": 0.0
+    },
+    {
+      "epoch": 100,
+      "loss": 0.5173,
+      "test_step_acc": 0.7688,
+      "test_trace_acc": 0.008
+    },
+    {
+      "epoch": 200,
+      "loss": 0.2976,
+      "test_step_acc": 0.8467,
+      "test_trace_acc": 0.059
+    },
+    {
+      "epoch": 300,
+      "loss": 0.0578,
+      "test_step_acc": 0.9873,
+      "test_trace_acc": 0.841
+    },
+    {
+      "epoch": 400,
+      "loss": 0.011,
+      "test_step_acc": 0.999,
+      "test_trace_acc": 0.986
+    },
+    {
+      "epoch": 500,
+      "loss": 0.0051,
+      "test_step_acc": 1.0,
+      "test_trace_acc": 1.0
+    }
+  ]
+}

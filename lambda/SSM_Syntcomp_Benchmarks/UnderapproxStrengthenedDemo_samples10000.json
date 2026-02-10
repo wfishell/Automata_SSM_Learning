@@ -1,0 +1,10 @@
+{
+  "file": "/workspaces/Automata_SSM_Learning/TestSet/benchmarks/tlsf_3/tsl_paper/UnderapproxStrengthenedDemo.tlsf",
+  "training_samples": 10000,
+  "error": "training_failed",
+  "converged_epoch": null,
+  "sample_complexity": null,
+  "test_trace_acc": null,
+  "acceptance": null,
+  "epoch_history": []
+}

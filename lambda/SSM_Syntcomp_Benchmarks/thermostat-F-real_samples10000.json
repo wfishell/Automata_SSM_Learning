@@ -1,0 +1,71 @@
+{
+  "file": "/workspaces/Automata_SSM_Learning/TestSet/benchmarks/tlsf_2/sweap/thermostat-F-real.tlsf",
+  "training_samples": 10000,
+  "error": null,
+  "converged_epoch": 1000,
+  "sample_complexity": 10000000,
+  "test_trace_acc": 0.998,
+  "acceptance": 99.8,
+  "epoch_history": [
+    {
+      "epoch": 0,
+      "loss": 0.7712,
+      "test_step_acc": 0.0231,
+      "test_trace_acc": 0.0
+    },
+    {
+      "epoch": 100,
+      "loss": 0.1108,
+      "test_step_acc": 0.9769,
+      "test_trace_acc": 0.6
+    },
+    {
+      "epoch": 200,
+      "loss": 0.0928,
+      "test_step_acc": 0.9769,
+      "test_trace_acc": 0.6
+    },
+    {
+      "epoch": 300,
+      "loss": 0.0227,
+      "test_step_acc": 1.0,
+      "test_trace_acc": 0.999
+    },
+    {
+      "epoch": 400,
+      "loss": 0.0059,
+      "test_step_acc": 0.9999,
+      "test_trace_acc": 0.998
+    },
+    {
+      "epoch": 500,
+      "loss": 0.0033,
+      "test_step_acc": 0.9999,
+      "test_trace_acc": 0.998
+    },
+    {
+      "epoch": 600,
+      "loss": 0.0023,
+      "test_step_acc": 0.9999,
+      "test_trace_acc": 0.998
+    },
+    {
+      "epoch": 700,
+      "loss": 0.0018,
+      "test_step_acc": 0.9999,
+      "test_trace_acc": 0.998
+    },
+    {
+      "epoch": 800,
+      "loss": 0.0015,
+      "test_step_acc": 0.9999,
+      "test_trace_acc": 0.998
+    },
+    {
+      "epoch": 900,
+      "loss": 0.0012,
+      "test_step_acc": 0.9999,
+      "test_trace_acc": 0.998
+    }
+  ]
+}

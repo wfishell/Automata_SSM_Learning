@@ -1,0 +1,35 @@
+{
+  "file": "/workspaces/Automata_SSM_Learning/TestSet/benchmarks/tlsf/lily/lilydemo04.tlsf",
+  "training_samples": 10000,
+  "error": null,
+  "converged_epoch": 300,
+  "sample_complexity": 3000000,
+  "test_trace_acc": 1.0,
+  "acceptance": 100.0,
+  "epoch_history": [
+    {
+      "epoch": 0,
+      "loss": 0.714,
+      "test_step_acc": 0.4033,
+      "test_trace_acc": 0.0
+    },
+    {
+      "epoch": 100,
+      "loss": 0.4171,
+      "test_step_acc": 0.8102,
+      "test_trace_acc": 0.049
+    },
+    {
+      "epoch": 200,
+      "loss": 0.1018,
+      "test_step_acc": 0.9858,
+      "test_trace_acc": 0.859
+    },
+    {
+      "epoch": 300,
+      "loss": 0.0134,
+      "test_step_acc": 1.0,
+      "test_trace_acc": 1.0
+    }
+  ]
+}

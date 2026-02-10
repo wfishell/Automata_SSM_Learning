@@ -1,0 +1,71 @@
+{
+  "file": "/workspaces/Automata_SSM_Learning/TestSet/benchmarks/tlsf_2/sweap/robot-grid-commute-1d-real.tlsf",
+  "training_samples": 10000,
+  "error": null,
+  "converged_epoch": 1000,
+  "sample_complexity": 10000000,
+  "test_trace_acc": 0.833,
+  "acceptance": 83.3,
+  "epoch_history": [
+    {
+      "epoch": 0,
+      "loss": 0.6706,
+      "test_step_acc": 0.8939,
+      "test_trace_acc": 0.156
+    },
+    {
+      "epoch": 100,
+      "loss": 0.1859,
+      "test_step_acc": 0.8939,
+      "test_trace_acc": 0.156
+    },
+    {
+      "epoch": 200,
+      "loss": 0.0981,
+      "test_step_acc": 0.9261,
+      "test_trace_acc": 0.205
+    },
+    {
+      "epoch": 300,
+      "loss": 0.055,
+      "test_step_acc": 0.9849,
+      "test_trace_acc": 0.788
+    },
+    {
+      "epoch": 400,
+      "loss": 0.0457,
+      "test_step_acc": 0.9848,
+      "test_trace_acc": 0.787
+    },
+    {
+      "epoch": 500,
+      "loss": 0.0413,
+      "test_step_acc": 0.9848,
+      "test_trace_acc": 0.788
+    },
+    {
+      "epoch": 600,
+      "loss": 0.0372,
+      "test_step_acc": 0.9848,
+      "test_trace_acc": 0.789
+    },
+    {
+      "epoch": 700,
+      "loss": 0.0328,
+      "test_step_acc": 0.9849,
+      "test_trace_acc": 0.79
+    },
+    {
+      "epoch": 800,
+      "loss": 0.0266,
+      "test_step_acc": 0.9901,
+      "test_trace_acc": 0.853
+    },
+    {
+      "epoch": 900,
+      "loss": 0.0174,
+      "test_step_acc": 0.9889,
+      "test_trace_acc": 0.833
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "file": "/workspaces/Automata_SSM_Learning/TestSet/benchmarks/tlsf/ltl2dba/non_parametric_from_acacia/ltl2dba11.tlsf",
+  "training_samples": 10000,
+  "error": "trace_generation_failed",
+  "converged_epoch": null,
+  "sample_complexity": null,
+  "test_trace_acc": null,
+  "acceptance": null,
+  "epoch_history": []
+}

@@ -1,0 +1,10 @@
+{
+  "file": "/workspaces/Automata_SSM_Learning/TestSet/benchmarks/tlsf/gui_glue_code_synthesis/11.tlsf",
+  "training_samples": 10000,
+  "error": "synthesis_failed",
+  "converged_epoch": null,
+  "sample_complexity": null,
+  "test_trace_acc": null,
+  "acceptance": null,
+  "epoch_history": []
+}

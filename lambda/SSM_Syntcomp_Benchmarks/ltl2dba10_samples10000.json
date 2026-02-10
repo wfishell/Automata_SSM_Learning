@@ -1,0 +1,35 @@
+{
+  "file": "/workspaces/Automata_SSM_Learning/TestSet/benchmarks/tlsf/ltl2dba/non_parametric_from_acacia/ltl2dba10.tlsf",
+  "training_samples": 10000,
+  "error": null,
+  "converged_epoch": 300,
+  "sample_complexity": 3000000,
+  "test_trace_acc": 1.0,
+  "acceptance": 100.0,
+  "epoch_history": [
+    {
+      "epoch": 0,
+      "loss": 0.6948,
+      "test_step_acc": 0.5014,
+      "test_trace_acc": 0.0
+    },
+    {
+      "epoch": 100,
+      "loss": 0.1446,
+      "test_step_acc": 0.9923,
+      "test_trace_acc": 0.865
+    },
+    {
+      "epoch": 200,
+      "loss": 0.0349,
+      "test_step_acc": 0.9993,
+      "test_trace_acc": 0.989
+    },
+    {
+      "epoch": 300,
+      "loss": 0.0113,
+      "test_step_acc": 1.0,
+      "test_trace_acc": 1.0
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "file": "/workspaces/Automata_SSM_Learning/TestSet/benchmarks/tlsf/ltl2dba/non_parametric_from_acacia/ltl2dba14.tlsf",
+  "training_samples": 10000,
+  "error": null,
+  "converged_epoch": 1000,
+  "sample_complexity": 10000000,
+  "test_trace_acc": 0.788,
+  "acceptance": 78.8,
+  "epoch_history": [
+    {
+      "epoch": 0,
+      "loss": 0.7285,
+      "test_step_acc": 0.0495,
+      "test_trace_acc": 0.0
+    },
+    {
+      "epoch": 100,
+      "loss": 0.1675,
+      "test_step_acc": 0.9506,
+      "test_trace_acc": 0.506
+    },
+    {
+      "epoch": 200,
+      "loss": 0.1355,
+      "test_step_acc": 0.9555,
+      "test_trace_acc": 0.517
+    },
+    {
+      "epoch": 300,
+      "loss": 0.0966,
+      "test_step_acc": 0.9573,
+      "test_trace_acc": 0.552
+    },
+    {
+      "epoch": 400,
+      "loss": 0.0747,
+      "test_step_acc": 0.9796,
+      "test_trace_acc": 0.775
+    },
+    {
+      "epoch": 500,
+      "loss": 0.0641,
+      "test_step_acc": 0.9804,
+      "test_trace_acc": 0.771
+    },
+    {
+      "epoch": 600,
+      "loss": 0.0608,
+      "test_step_acc": 0.9802,
+      "test_trace_acc": 0.763
+    },
+    {
+      "epoch": 700,
+      "loss": 0.0591,
+      "test_step_acc": 0.9812,
+      "test_trace_acc": 0.772
+    },
+    {
+      "epoch": 800,
+      "loss": 0.058,
+      "test_step_acc": 0.9823,
+      "test_trace_acc": 0.787
+    },
+    {
+      "epoch": 900,
+      "loss": 0.0572,
+      "test_step_acc": 0.9825,
+      "test_trace_acc": 0.788
+    }
+  ]
+}
