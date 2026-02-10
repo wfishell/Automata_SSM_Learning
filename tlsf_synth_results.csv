@@ -1,0 +1,276 @@
+tlsf_name,success,realizable,num_states,num_inputs,num_outputs,error
+TorcsAccelerating,True,True,1,2,6,
+MusicAppSimple,True,True,3,4,3,
+Button,True,True,1,1,4,
+SensorSubmodulChooser,True,True,4,4,15,
+Cockpitboard,True,True,1,6,19,
+Gamemodule,True,True,1,4,4,
+Automata16S,True,True,17,2,21,
+TorcsGearing,True,True,2,1,3,
+UnderapproxStrengthenedDemo,True,True,1,0,0,
+Zoo10,True,True,3,3,8,
+TorcsSteeringSmart,True,True,7,4,6,
+RegManager,True,True,1,2,8,
+SliderDelayed,True,True,16,4,9,
+EscalatorBidirectionalInit,True,True,3,7,8,
+SPIReadManag,True,True,4,8,16,
+KitchenTimerV2,True,True,13,4,6,
+KitchenTimerV7,True,True,58,4,8,
+EscalatorCounting,True,True,2,3,6,
+SPIWriteManag,True,True,2,5,15,
+Zoo5,True,True,3,3,8,
+TwoCounters3,True,True,1,10,8,
+ActionConverter,True,True,1,5,6,
+Scoreboard,True,True,1,5,12,
+EnemeyModule,True,True,1,2,7,
+KitchenTimerV3,True,True,28,4,6,
+SliderScored,True,True,7,4,9,
+MusicAppMotivating,True,True,4,5,3,
+SPIWriteClk,True,True,1,5,3,
+SensorInit,True,True,8,2,17,
+SliderDefault,True,True,8,2,3,
+SensorSelector,True,True,1,4,25,
+KitchenTimerV0,True,True,1,2,2,
+Zoo0,True,True,3,3,9,
+Radarboard,True,True,1,5,24,
+EscalatorSmart,True,True,8,4,3,
+TorcsSimple,True,True,1,3,8,
+SPIReadClk,True,True,1,3,3,
+SPIWriteSdi,True,True,1,6,4,
+OneCounter,True,True,5,9,9,
+Gamelogic,True,True,3,5,25,
+MusicAppFeedback,True,True,15,5,3,
+EscalatorNonReactive,True,True,1,0,2,
+EscalatorBidirectional,True,True,2,7,7,
+SPI,True,True,5,4,16,
+TorcsSteeringImproved,True,True,2,4,8,
+SensorRegister,True,True,1,1,2,
+LedMatrix,True,True,37,3,27,
+Increment,True,True,1,1,2,
+RotationCalculator,True,True,1,6,8,
+EscalatorCountingInit,True,True,3,3,7,
+KitchenTimerV10,True,True,47,4,11,
+KitchenTimerV5,True,True,62,4,6,
+KitchenTimerV8,True,True,58,4,11,
+OneCounterInRangeA3,True,True,1,5,3,
+EscalatorNonCounting,True,True,1,2,3,
+KitchenTimerV4,True,True,37,4,6,
+TorcsSteeringSimple,True,True,1,4,3,
+Automata,True,True,9,2,13,
+Automata32S,True,True,33,2,37,
+TwoCountersRefinedRefined,True,True,2,6,8,
+Sensor,True,True,19,4,6,
+SensorPart,True,True,8,2,21,
+SPIReadSdi,True,True,1,4,3,
+KitchenTimerV1,True,True,4,2,6,
+KitchenTimerV6,True,True,58,4,6,
+TwoCounters4,True,True,1,11,8,
+storage-GF-64-real,True,True,6,9,1,
+box-real,True,True,6,8,2,
+box-limited-real,True,True,3,5,2,
+KitchenTimerV9,True,True,58,4,11,
+batch-arbiter-real,True,True,12,8,3,
+robot-grid-reach-1d-real,True,True,9,8,2,
+robot-grid-reach-2d-real,True,True,45,13,3,
+taxi-service-real,True,True,70,13,3,
+thermostat-F-real,True,True,7,14,1,
+robot-cat-real-1d-real,True,True,29,14,2,
+tasks-real,True,True,2,11,2,
+buffer-storage-real,True,True,9,12,1,
+robot-grid-commute-1d-real,True,True,25,13,2,
+solitary-real,True,True,3,6,1,
+robot-grid-reach-repeated-with-obstacles-2d-real,True,True,47,13,3,
+precise-reachability-real,True,True,11,8,2,
+arbiter-with-failure-real,True,True,9,7,2,
+robot-tasks-real,True,True,1,11,0,
+robot_collect_samples_v2-real,True,True,19,18,2,
+robot-grid-reach-repeated-with-obstacles-1d-real,True,True,11,8,2,
+ModdifiedLedMatrix5X,True,True,7,3,25,
+full_arbiter,True,True,6,2,2,
+ltl2dpa04,True,True,2,2,2,
+load_balancer_unreal2,True,True,7,3,2,
+ltl2dpa08,True,True,3,2,2,
+ltl2dpa07,True,True,2,3,2,
+ltl2dpa02,True,True,2,2,2,
+ltl2dpa22,True,True,231,6,3,
+ltl2dpa19,True,True,13,3,3,
+ltl2dpa03,True,True,67,3,3,
+ltl2dpa15,True,True,2,2,2,
+ltl2dpa06,True,True,2,3,2,
+ltl2dpa11,True,True,2,3,2,
+ltl2dpa17,True,True,4,3,2,
+ltl2dpa24,True,True,2,2,2,
+ltl2dpa20,True,True,4,2,2,
+ltl2dpa23,True,True,2,2,2,
+ltl2dpa14,True,True,3,1,3,
+ltl2dpa09,True,True,2,3,2,
+ltl2dpa01,True,True,3,1,3,
+ltl2dpa16,True,True,4,2,2,
+ltl2dpa13,True,True,19,2,3,
+ltl2dpa05,True,True,1,2,2,
+ltl2dpa10,True,True,40,2,3,
+ltl2dpa12,True,True,24,2,4,
+ltl2dpa18,True,True,4,2,2,
+arbiter_with_buffer,True,True,1,1,2,
+arbiter_on_inpchange,True,True,7,1,1,
+arbiter_with_cancel,True,True,2,2,1,
+arbiter,True,True,2,1,1,
+rw_arbiter,True,True,6,2,2,
+abcg_arbiter,True,True,6,1,4,
+unordered-visits-real,True,True,31,11,4,
+chomp,True,True,6,4,10,
+load_balancer,True,True,7,3,2,
+generalized_buffer,True,True,1560,4,4,
+workstation_resupply_pb_1_pe_,True,True,8,1,7,
+workstation_resupply_pb_2_pe_,True,True,13,2,9,
+finding_nemo_pb_3_pe_,False,,,,,"No HOA output. stderr: ""Conversion Error"": unsupported operator
+The given specification cannot be transformed into the selected format.
+The selected format does not support the temporal operator: ""strong next"".
+ltlsynt: 'sy"
+finding_nemo_pb_5_pe_,False,,,,,"No HOA output. stderr: ""Conversion Error"": unsupported operator
+The given specification cannot be transformed into the selected format.
+The selected format does not support the temporal operator: ""strong next"".
+ltlsynt: 'sy"
+workstation_resupply_pb_3_pe_,True,True,19,3,11,
+finding_nemo_pb_2_pe_,False,,,,,"No HOA output. stderr: ""Conversion Error"": unsupported operator
+The given specification cannot be transformed into the selected format.
+The selected format does not support the temporal operator: ""strong next"".
+ltlsynt: 'sy"
+finding_nemo_pb_4_pe_,False,,,,,"No HOA output. stderr: ""Conversion Error"": unsupported operator
+The given specification cannot be transformed into the selected format.
+The selected format does not support the temporal operator: ""strong next"".
+ltlsynt: 'sy"
+finding_nemo_pb_7_pe_,False,,,,,"No HOA output. stderr: ""Conversion Error"": unsupported operator
+The given specification cannot be transformed into the selected format.
+The selected format does not support the temporal operator: ""strong next"".
+ltlsynt: 'sy"
+finding_nemo_pb_6_pe_,False,,,,,"No HOA output. stderr: ""Conversion Error"": unsupported operator
+The given specification cannot be transformed into the selected format.
+The selected format does not support the temporal operator: ""strong next"".
+ltlsynt: 'sy"
+finding_nemo_pb_1_pe_,False,,,,,"No HOA output. stderr: ""Conversion Error"": unsupported operator
+The given specification cannot be transformed into the selected format.
+The selected format does not support the temporal operator: ""strong next"".
+ltlsynt: 'sy"
+ltl2dba_C2,True,True,2,2,1,
+ltl2dba_beta,True,True,9,4,1,
+ltl2dba_U1,True,True,3,2,1,
+ltl2dba_E,True,True,4,2,1,
+ltl2dba_Q,True,True,6,2,1,
+ltl2dba_alpha,True,True,4,2,1,
+ltl2dba21,True,True,8,2,1,
+ltl2dba26,True,True,3,3,1,
+ltl2dba23,True,True,3,2,1,
+ltl2dba14,True,True,3,3,1,
+ltl2dba08,True,True,5,5,1,
+ltl2dba19,True,True,9,2,1,
+ltl2dba06,True,True,5,4,1,
+ltl2dba02,True,True,12,3,1,
+ltl2dba03,True,True,4,3,1,
+ltl2dba20,True,True,5,4,1,
+ltl2dba17,True,True,4,2,1,
+ltl2dba25,True,True,3,3,1,
+ltl2dba11,True,True,1,2,1,
+ltl2dba15,True,True,1,2,1,
+ltl2dba13,True,True,2,3,1,
+ltl2dba01,True,True,3,3,1,
+ltl2dba18,True,True,4,3,1,
+ltl2dba22,True,True,2,1,1,
+ltl2dba07,True,True,9,7,1,
+ltl2dba16,True,True,3,2,1,
+ltl2dba05,True,True,5,4,1,
+ltl2dba12,True,True,4,2,1,
+ltl2dba10,True,True,2,2,1,
+ltl2dba04,True,True,3,3,1,
+ltl2dba09,True,True,1,3,1,
+mux,True,True,1,14,1,
+collector_v1,True,True,13,3,1,
+collector_v3,True,True,4,3,1,
+collector_v2,True,True,8,3,1,
+lift_unary_enc,True,True,15,2,5,
+lift_gr1,True,True,15,3,4,
+lift,True,True,10,2,4,
+lift_gr1+,True,True,49,4,5,
+robot_grid,True,True,42,4,5,
+lilydemo21,True,True,72,4,4,
+lilydemo05,True,True,4,3,1,
+lilydemo06,True,True,5,3,1,
+lilydemo17,True,True,3,2,3,
+lilydemo08,True,True,1,1,1,
+lilydemo12,True,True,1,2,2,
+lilydemo23,True,True,3,1,1,
+lilydemo09,True,True,3,1,1,
+lilydemo07,True,True,5,3,1,
+lilydemo04,True,True,4,3,1,
+lilydemo15,True,True,6,2,2,
+lilydemo10,True,True,1,2,2,
+lilydemo20,True,True,4,2,3,
+lilydemo22,True,True,14,3,1,
+lilydemo16,True,True,23,3,3,
+lilydemo13,True,True,1,1,1,
+lilydemo03,True,True,2,3,1,
+lilydemo14,True,True,2,2,2,
+lilydemo19,True,True,3,2,2,
+lilydemo18,True,True,4,3,4,
+example8,True,True,2,2,2,
+example7a,True,True,5,2,2,
+example10a,True,True,12,1,1,
+example9,True,True,6,1,1,
+example7,True,True,2,2,2,
+example10,True,True,6,1,1,
+workstation_resupply_pb_4_pe_,True,True,173,4,13,
+11,False,,,,,"No HOA output. stderr: free(): invalid pointer
+"
+02,True,True,7,4,4,
+12,False,,,,,"No HOA output. stderr: ltlsynt: Too many acceptance sets used.  The limit is 32.
+
+If you do not mind a slowdown, you could try recompiling Spot with a larger limit.
+See the --enable-max-accsets=N configure option.
+
+If you b"
+07,False,,,,,"No HOA output. stderr: double free or corruption (out)
+"
+10,False,,,,,"No HOA output. stderr: free(): invalid pointer
+"
+01,True,True,7,4,3,
+13,False,,,,,"No HOA output. stderr: ltlsynt: Too many acceptance sets used.  The limit is 32.
+
+If you do not mind a slowdown, you could try recompiling Spot with a larger limit.
+See the --enable-max-accsets=N configure option.
+
+If you b"
+08,False,,,,,"No HOA output. stderr: ltlsynt: Too many acceptance sets used.  The limit is 32.
+
+If you do not mind a slowdown, you could try recompiling Spot with a larger limit.
+See the --enable-max-accsets=N configure option.
+
+If you b"
+simple_arbiter_with_hints,True,True,2551,9,9,
+06,False,,,,,"No HOA output. stderr: double free or corruption (out)
+"
+09,False,,,,,"No HOA output. stderr: free(): invalid pointer
+"
+full_arbiter_enc,True,True,1362,3,4,
+diagonal-real,True,True,3,7,2,
+thermostat-GF-real,True,True,142,14,4,
+ordered-visits-choice-real,True,True,1,8,1,
+heim-buechi-real,True,True,38,14,1,
+03,True,True,78,5,5,
+heim-double-x-real,True,True,11,14,1,
+chain-simple-5-real,True,True,24,12,2,
+chain-simple-10-real,True,True,39,12,2,
+ordered-visits-real,True,True,1,9,1,
+elevator-paper-real,True,True,13,7,2,
+evasion-real,True,True,13,13,4,
+f-real-real,True,True,22,11,3,
+gf-real-real,True,True,19,6,1,
+chain-simple-20-real,True,True,69,13,2,
+chain-simple-30-real,True,True,99,14,2,
+infinite-race-real,True,True,6,5,1,
+chain-simple-50-real,True,True,159,14,2,
+chain-simple-param-70-real,True,True,13,15,2,
+infinite-race-unequal-1-real,True,True,7,12,1,
+chain-simple-70-real,True,True,219,15,2,
+chain-simple-60-real,True,True,189,14,2,
+chain-simple-40-real,True,True,129,14,2,
+g-real-real,True,True,16,16,2,

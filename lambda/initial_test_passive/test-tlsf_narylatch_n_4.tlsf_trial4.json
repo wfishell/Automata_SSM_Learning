@@ -1,0 +1,1 @@
+{"tlsf_file": "test-tlsf/narylatch_n_4.tlsf", "trial": 4, "trace_length": 20, "results": [{"num_traces": 5000, "sample_size": 100000, "accuracy": 88.7}, {"num_traces": 10000, "sample_size": 200000, "accuracy": 92.3}, {"num_traces": 15000, "sample_size": 300000, "accuracy": 100.0}], "final_accuracy": 100.0, "final_traces": 15000, "status": "success"}

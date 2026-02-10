@@ -1,0 +1,174 @@
+% Requires: \usepackage{longtable, booktabs, makecell}
+\begin{small}  % Options: \tiny, \scriptsize, \footnotesize, \small, \normalsize
+\begin{longtable}{p{5cm}|rrr|rrr}
+\caption{Comparison of learning methods on SYNTCOMP benchmarks.} \label{tab:benchmark_comparison} \\
+\toprule
+Benchmark & SSM Acc (\%) & L* Acc (\%) & RPNI Acc (\%) & SSM Samples & L* Samples & RPNI Samples \\
+\midrule
+\endfirsthead
+
+\multicolumn{7}{c}{\tablename\ \thetable{} -- continued from previous page} \\
+\toprule
+Benchmark & SSM Acc (\%) & L* Acc (\%) & RPNI Acc (\%) & SSM Samples & L* Samples & RPNI Samples \\
+\midrule
+\endhead
+
+\midrule
+\multicolumn{7}{r}{Continued on next page} \\
+\endfoot
+
+\bottomrule
+\endlastfoot
+
+$\mathtt{01}$ & 26.9 & 100.0 & 100.0 & 8,100,000 & 6,346 & 5,000 \\
+$\mathtt{02}$ & 7.6 & 100.0 & 100.0 & 8,100,000 & 6,440 & 5,000 \\
+$\mathtt{03}$ & 2.3 & 99.0 & 0.0 & 8,100,000 & 79,764 & 5,000 \\
+$\mathtt{EscalatorSmart}$ & 0.0 & 100.0 & 100.0 & 8,100,000 & 6,959 & 5,000 \\
+$\mathtt{Gamemodule}$ & 0.2 & 100.0 & 100.0 & 8,100,000 & 4,721 & 5,000 \\
+$\mathtt{KitchenTimerV1}$ & 100.0 & 100.0 & 100.0 & 4,500,000 & 1,878 & 5,000 \\
+$\mathtt{KitchenTimerV2}$ & 39.4 & 100.0 & 100.0 & 8,100,000 & 7,843 & 5,000 \\
+$\mathtt{KitchenTimerV3}$ & 1.1 & 100.0 & 93.5 & 8,100,000 & 11,775 & 30,000 \\
+$\mathtt{KitchenTimerV5}$ & 0.0 & 100.0 & 12.4 & 8,100,000 & 23,099 & 10,000 \\
+$\mathtt{MusicAppFeedback}$ & 0.0 & 100.0 & 9.6 & 8,100,000 & 20,296 & 25,000 \\
+$\mathtt{MusicAppSimple}$ & 3.0 & 100.0 & 100.0 & 8,100,000 & 5,048 & 5,000 \\
+$\mathtt{SPIReadSdi}$ & 0.0 & 100.0 & 100.0 & 8,100,000 & 4,759 & 5,000 \\
+$\mathtt{SPIWriteManag}$ & 10.1 & 0.0 & 100.0 & 8,100,000 & 6,533 & 5,000 \\
+$\mathtt{SPIWriteSdi}$ & 0.3 & 0.0 & 100.0 & 8,100,000 & 8,624 & 5,000 \\
+$\mathtt{SliderDefault}$ & 51.2 & 100.0 & 0.0 & 8,100,000 & 1,974 & 5,000 \\
+$\mathtt{SliderScored}$ & 0.0 & 100.0 & 100.0 & 8,100,000 & 6,267 & 5,000 \\
+$\mathtt{TorcsGearing}$ & 100.0 & 100.0 & 100.0 & 1,800,000 & 912 & 5,000 \\
+$\mathtt{abcg\_arbiter}$ & 100.0 & 100.0 & 100.0 & 3,600,000 & 921 & 5,000 \\
+$\mathtt{arbiter}$ & 100.0 & 100.0 & 100.0 & 1,800,000 & 888 & 5,000 \\
+$\mathtt{box-limited-real}$ & 0.6 & 100.0 & 96.6 & 8,100,000 & 6,563 & 20,000 \\
+$\mathtt{box-real}$ & 30.3 & 100.0 & 100.0 & 8,100,000 & 291,353 & 5,000 \\
+$\mathtt{chomp}$ & 1.5 & 100.0 & 100.0 & 8,100,000 & 6,044 & 5,000 \\
+$\mathtt{collector\_v1}$ & 81.8 & 100.0 & 0.3 & 8,100,000 & 4,484 & 25,000 \\
+$\mathtt{collector\_v2}$ & 100.0 & 100.0 & 6.5 & 8,100,000 & 4,345 & 30,000 \\
+$\mathtt{collector\_v3}$ & 100.0 & 100.0 & 100.0 & 8,100,000 & 3,877 & 5,000 \\
+$\mathtt{diagonal-real}$ & 7.4 & 100.0 & 98.2 & 8,100,000 & 53,711 & 10,000 \\
+$\mathtt{evasion-real}$ & 82.3 & 0.0 & 100.0 & 8,100,000 & — & 5,000 \\
+$\mathtt{example10a}$ & 100.0 & 100.0 & 100.0 & 4,500,000 & 1,046 & 5,000 \\
+$\mathtt{example10}$ & 100.0 & 100.0 & 6.7 & 4,500,000 & 959 & 15,000 \\
+$\mathtt{example7a}$ & 100.0 & 100.0 & 100.0 & 4,500,000 & 1,883 & 5,000 \\
+$\mathtt{example7}$ & 100.0 & 100.0 & 100.0 & 900,000 & 1,857 & 5,000 \\
+$\mathtt{example8}$ & 100.0 & 100.0 & 100.0 & 1,800,000 & 1,870 & 5,000 \\
+$\mathtt{example9}$ & 100.0 & 100.0 & 100.0 & 2,700,000 & 925 & 5,000 \\
+$\mathtt{f-real-real}$ & 11.2 & 0.0 & 100.0 & 8,100,000 & — & 5,000 \\
+$\mathtt{full\_arbiter}$ & 100.0 & 100.0 & 100.0 & 3,600,000 & 1,912 & 5,000 \\
+$\mathtt{g-real-real}$ & 88.1 & 0.0 & 100.0 & 8,100,000 & — & 15,000 \\
+$\mathtt{gf-real-real}$ & 17.4 & 94.9 & 2.7 & 8,100,000 & 72,393 & 15,000 \\
+$\mathtt{heim-buechi-real}$ & 98.9 & 0.0 & 100.0 & 8,100,000 & — & 5,000 \\
+$\mathtt{lift\_gr1+}$ & 0.0 & 100.0 & 44.2 & 8,100,000 & 19,565 & 30,000 \\
+$\mathtt{lift\_gr1}$ & 2.4 & 100.0 & 100.0 & 8,100,000 & 4,758 & 10,000 \\
+$\mathtt{lift\_unary\_enc}$ & 1.1 & 100.0 & 100.0 & 8,100,000 & 2,135 & 5,000 \\
+$\mathtt{lift}$ & 0.1 & 100.0 & 100.0 & 8,100,000 & 1,976 & 5,000 \\
+$\mathtt{lilydemo03}$ & 100.0 & 100.0 & 100.0 & 900,000 & 3,768 & 5,000 \\
+$\mathtt{lilydemo04}$ & 100.0 & 100.0 & 39.1 & 2,700,000 & 3,879 & 25,000 \\
+$\mathtt{lilydemo05}$ & 100.0 & 100.0 & 100.0 & 3,600,000 & 3,850 & 5,000 \\
+$\mathtt{lilydemo06}$ & 100.0 & 100.0 & 100.0 & 6,300,000 & 4,008 & 5,000 \\
+$\mathtt{lilydemo07}$ & 100.0 & 100.0 & 100.0 & 4,500,000 & 3,931 & 5,000 \\
+$\mathtt{lilydemo08}$ & 100.0 & 100.0 & 100.0 & 900,000 & 905 & 5,000 \\
+$\mathtt{lilydemo09}$ & 100.0 & 100.0 & 100.0 & 6,300,000 & 950 & 5,000 \\
+$\mathtt{lilydemo10}$ & 100.0 & 100.0 & 100.0 & 900,000 & 1,829 & 5,000 \\
+$\mathtt{lilydemo14}$ & 100.0 & 100.0 & 100.0 & 900,000 & 1,844 & 5,000 \\
+$\mathtt{lilydemo15}$ & 100.0 & 100.0 & 100.0 & 8,100,000 & 1,923 & 5,000 \\
+$\mathtt{lilydemo16}$ & 60.2 & 100.0 & 100.0 & 8,100,000 & 5,455 & 5,000 \\
+$\mathtt{lilydemo17}$ & 100.0 & 100.0 & 100.0 & 1,800,000 & 1,857 & 5,000 \\
+$\mathtt{lilydemo18}$ & 100.0 & 100.0 & 100.0 & 1,800,000 & 3,880 & 5,000 \\
+$\mathtt{lilydemo19}$ & 100.0 & 100.0 & 100.0 & 2,700,000 & 1,871 & 5,000 \\
+$\mathtt{lilydemo20}$ & 75.3 & 100.0 & 100.0 & 8,100,000 & 1,833 & 5,000 \\
+$\mathtt{lilydemo21}$ & 0.6 & 99.4 & 100.0 & 8,100,000 & 25,482 & 10,000 \\
+$\mathtt{lilydemo22}$ & 40.6 & 100.0 & 100.0 & 8,100,000 & 5,026 & 5,000 \\
+$\mathtt{lilydemo23}$ & 100.0 & 100.0 & 100.0 & 1,800,000 & 913 & 5,000 \\
+$\mathtt{load\_balancer}$ & 74.2 & 100.0 & 100.0 & 8,100,000 & 4,020 & 5,000 \\
+$\mathtt{ltl2dba01}$ & 72.3 & 100.0 & 36.4 & 8,100,000 & 3,818 & 10,000 \\
+$\mathtt{ltl2dba02}$ & 54.8 & 100.0 & 48.5 & 8,100,000 & 5,515 & 30,000 \\
+$\mathtt{ltl2dba03}$ & 98.2 & 100.0 & 21.1 & 8,100,000 & 3,902 & 5,000 \\
+$\mathtt{ltl2dba04}$ & 99.5 & 100.0 & 0.5 & 8,100,000 & 3,802 & 5,000 \\
+$\mathtt{ltl2dba05}$ & 63.6 & 100.0 & 15.6 & 8,100,000 & 6,040 & 20,000 \\
+$\mathtt{ltl2dba06}$ & 19.6 & 100.0 & 13.6 & 8,100,000 & 5,942 & 15,000 \\
+$\mathtt{ltl2dba07}$ & 48.2 & 100.0 & 14.9 & 8,100,000 & 156,904 & 15,000 \\
+$\mathtt{ltl2dba10}$ & 100.0 & 100.0 & 100.0 & 2,700,000 & 1,852 & 5,000 \\
+$\mathtt{ltl2dba12}$ & 84.2 & 100.0 & 0.0 & 8,100,000 & 1,921 & 5,000 \\
+$\mathtt{ltl2dba13}$ & 100.0 & 100.0 & 100.0 & 4,500,000 & 3,730 & 5,000 \\
+$\mathtt{ltl2dba14}$ & 78.8 & 100.0 & 0.5 & 8,100,000 & 3,797 & 10,000 \\
+$\mathtt{ltl2dba16}$ & 31.5 & 100.0 & 100.0 & 8,100,000 & 1,821 & 5,000 \\
+$\mathtt{ltl2dba18}$ & 23.1 & 100.0 & 11.3 & 8,100,000 & 3,889 & 10,000 \\
+$\mathtt{ltl2dba19}$ & 100.0 & 100.0 & 6.5 & 6,300,000 & 2,090 & 5,000 \\
+$\mathtt{ltl2dba20}$ & 7.6 & 100.0 & 8.4 & 8,100,000 & 5,989 & 20,000 \\
+$\mathtt{ltl2dba22}$ & 100.0 & 100.0 & 0.0 & 4,500,000 & 915 & 5,000 \\
+$\mathtt{ltl2dba23}$ & 100.0 & 100.0 & 0.0 & 8,100,000 & 1,824 & 5,000 \\
+$\mathtt{ltl2dba25}$ & 69.9 & 100.0 & 0.4 & 8,100,000 & 3,800 & 15,000 \\
+$\mathtt{ltl2dba26}$ & 58.4 & 100.0 & 8.8 & 8,100,000 & 3,772 & 20,000 \\
+$\mathtt{ltl2dba\_E}$ & 69.1 & 100.0 & 68.1 & 8,100,000 & 1,912 & 5,000 \\
+$\mathtt{ltl2dba\_Q}$ & 67.2 & 100.0 & 90.3 & 8,100,000 & 2,011 & 10,000 \\
+$\mathtt{ltl2dba\_U1}$ & 100.0 & 100.0 & 53.2 & 2,700,000 & 1,859 & 25,000 \\
+$\mathtt{ltl2dba\_alpha}$ & 100.0 & 100.0 & 100.0 & 3,600,000 & 1,870 & 5,000 \\
+$\mathtt{ltl2dba\_beta}$ & 62.5 & 100.0 & 52.4 & 8,100,000 & 7,631 & 10,000 \\
+$\mathtt{ltl2dpa01}$ & 100.0 & 100.0 & 100.0 & 2,700,000 & 934 & 5,000 \\
+$\mathtt{ltl2dpa02}$ & 100.0 & 100.0 & 8.7 & 3,600,000 & 1,814 & 5,000 \\
+$\mathtt{ltl2dpa03}$ & 25.7 & 100.0 & 100.0 & 8,100,000 & 12,887 & 10,000 \\
+$\mathtt{ltl2dpa04}$ & 100.0 & 100.0 & 100.0 & 3,600,000 & 1,820 & 5,000 \\
+$\mathtt{ltl2dpa06}$ & 100.0 & 100.0 & 0.0 & 4,500,000 & 3,732 & 5,000 \\
+$\mathtt{ltl2dpa07}$ & 100.0 & 100.0 & 7.9 & 4,500,000 & 3,693 & 15,000 \\
+$\mathtt{ltl2dpa08}$ & 100.0 & 100.0 & 75.6 & 7,200,000 & 1,862 & 5,000 \\
+$\mathtt{ltl2dpa09}$ & 1.7 & 100.0 & 8.6 & 8,100,000 & 3,709 & 5,000 \\
+$\mathtt{ltl2dpa10}$ & 79.1 & 99.9 & 100.0 & 8,100,000 & 2,937 & 5,000 \\
+$\mathtt{ltl2dpa12}$ & 24.6 & 100.0 & 100.0 & 8,100,000 & 2,648 & 5,000 \\
+$\mathtt{ltl2dpa13}$ & 79.8 & 100.0 & 64.7 & 8,100,000 & 2,469 & 5,000 \\
+$\mathtt{ltl2dpa14}$ & 100.0 & 100.0 & 100.0 & 2,700,000 & 917 & 5,000 \\
+$\mathtt{ltl2dpa16}$ & 88.0 & 100.0 & 69.0 & 8,100,000 & 1,899 & 10,000 \\
+$\mathtt{ltl2dpa17}$ & 63.2 & 100.0 & 0.0 & 8,100,000 & 3,889 & 5,000 \\
+$\mathtt{ltl2dpa18}$ & 85.6 & 100.0 & 0.0 & 8,100,000 & 1,855 & 5,000 \\
+$\mathtt{ltl2dpa19}$ & 49.2 & 100.0 & 68.7 & 8,100,000 & 4,417 & 10,000 \\
+$\mathtt{ltl2dpa20}$ & 77.2 & 100.0 & 69.5 & 8,100,000 & 1,918 & 25,000 \\
+$\mathtt{ltl2dpa23}$ & 100.0 & 100.0 & 100.0 & 1,800,000 & 1,787 & 5,000 \\
+$\mathtt{ltl2dpa24}$ & 100.0 & 100.0 & 100.0 & 1,800,000 & 1,819 & 5,000 \\
+$\mathtt{robot-tasks-real}$ & 100.0 & 0.0 & 100.0 & 900,000 & — & 5,000 \\
+$\mathtt{robot\_grid}$ & 0.0 & 100.0 & 35.3 & 8,100,000 & 16,342 & 30,000 \\
+$\mathtt{rw\_arbiter}$ & 100.0 & 100.0 & 37.5 & 5,400,000 & 1,860 & 5,000 \\
+$\mathtt{solitary-real}$ & 99.2 & 100.0 & 100.0 & 8,100,000 & 16,781 & 5,000 \\
+$\mathtt{tasks-real}$ & 99.2 & 0.0 & 100.0 & 8,100,000 & — & 5,000 \\
+\makecell[l]{$\mathtt{EscalatorBidirectional}$} & 0.0 & 0.0 & 100.0 & 8,100,000 & 37,258 & 5,000 \\
+\makecell[l]{$\mathtt{EscalatorCountingInit}$} & 33.6 & 100.0 & 100.0 & 8,100,000 & 3,766 & 5,000 \\
+\makecell[l]{$\mathtt{EscalatorNonReactive}$} & 100.0 & 0.0 & 100.0 & 900,000 & — & 5,000 \\
+\makecell[l]{$\mathtt{MusicAppMotivating}$} & 2.1 & 100.0 & 2.6 & 8,100,000 & 8,564 & 5,000 \\
+\makecell[l]{$\mathtt{OneCounterInRangeA3}$} & 1.8 & 100.0 & 100.0 & 8,100,000 & 5,490 & 5,000 \\
+\makecell[l]{$\mathtt{TorcsAccelerating}$} & 100.0 & 100.0 & 100.0 & 900,000 & 1,799 & 5,000 \\
+\makecell[l]{$\mathtt{TorcsSteeringSimple}$} & 0.2 & 100.0 & 100.0 & 8,100,000 & 4,726 & 5,000 \\
+\makecell[l]{$\mathtt{TorcsSteeringSmart}$} & 0.0 & 100.0 & 22.2 & 8,100,000 & 6,314 & 25,000 \\
+\makecell[l]{$\mathtt{arbiter-with-failure-}$ \\ $\mathtt{real}$} & 1.8 & 100.0 & 39.2 & 8,100,000 & 154,618 & 5,000 \\
+\makecell[l]{$\mathtt{arbiter\_on\_inpchange}$} & 100.0 & 100.0 & 5.9 & 4,500,000 & 942 & 25,000 \\
+\makecell[l]{$\mathtt{arbiter\_with\_cancel}$} & 100.0 & 100.0 & 0.1 & 1,800,000 & 1,780 & 10,000 \\
+\makecell[l]{$\mathtt{batch-arbiter-real}$} & 20.4 & 100.0 & 100.0 & 8,100,000 & 333,487 & 5,000 \\
+\makecell[l]{$\mathtt{chain-simple-10-}$ \\ $\mathtt{real}$} & 94.8 & 0.0 & 63.0 & 8,100,000 & — & 15,000 \\
+\makecell[l]{$\mathtt{chain-simple-20-}$ \\ $\mathtt{real}$} & 93.0 & 0.0 & 63.7 & 8,100,000 & — & 15,000 \\
+\makecell[l]{$\mathtt{chain-simple-30-}$ \\ $\mathtt{real}$} & 96.3 & 0.0 & 63.1 & 8,100,000 & — & 20,000 \\
+\makecell[l]{$\mathtt{chain-simple-40-}$ \\ $\mathtt{real}$} & 94.6 & 0.0 & 64.2 & 8,100,000 & — & 20,000 \\
+\makecell[l]{$\mathtt{chain-simple-5-real}$} & 96.0 & 0.0 & 42.7 & 8,100,000 & — & 5,000 \\
+\makecell[l]{$\mathtt{chain-simple-50-}$ \\ $\mathtt{real}$} & 94.2 & 0.0 & 64.7 & 8,100,000 & — & 5,000 \\
+\makecell[l]{$\mathtt{chain-simple-60-}$ \\ $\mathtt{real}$} & 94.4 & 0.0 & 64.0 & 8,100,000 & — & 5,000 \\
+\makecell[l]{$\mathtt{chain-simple-70-}$ \\ $\mathtt{real}$} & 95.1 & 0.0 & 64.2 & 8,100,000 & — & 25,000 \\
+\makecell[l]{$\mathtt{chain-simple-param-}$ \\ $\mathtt{70-real}$} & 97.7 & 0.0 & 100.0 & 8,100,000 & — & 5,000 \\
+\makecell[l]{$\mathtt{generalized\_buffer}$} & 4.2 & 99.9 & 0.0 & 8,100,000 & 509,491 & 5,000 \\
+\makecell[l]{$\mathtt{heim-double-x-real}$} & 99.4 & 0.0 & 100.0 & 8,100,000 & — & 5,000 \\
+\makecell[l]{$\mathtt{infinite-race-real}$} & 97.0 & 100.0 & 100.0 & 8,100,000 & 9,989 & 5,000 \\
+\makecell[l]{$\mathtt{infinite-race-unequal-}$ \\ $\mathtt{1-real}$} & 98.8 & 0.0 & 100.0 & 8,100,000 & — & 5,000 \\
+\makecell[l]{$\mathtt{load\_balancer\_unreal2}$} & 72.8 & 100.0 & 100.0 & 8,100,000 & 3,961 & 5,000 \\
+\makecell[l]{$\mathtt{ordered-visits-real}$} & 100.0 & 100.0 & 100.0 & 8,100,000 & 266,715 & 5,000 \\
+\makecell[l]{$\mathtt{precise-reachability-}$ \\ $\mathtt{real}$} & 88.3 & 100.0 & 98.6 & 8,100,000 & 531,210 & 30,000 \\
+\makecell[l]{$\mathtt{robot-cat-real-1d-}$ \\ $\mathtt{real}$} & 98.5 & 0.0 & 100.0 & 8,100,000 & — & 5,000 \\
+\makecell[l]{$\mathtt{robot-grid-commute-}$ \\ $\mathtt{1d-real}$} & 83.3 & 0.0 & 100.0 & 8,100,000 & — & 5,000 \\
+\makecell[l]{$\mathtt{robot-grid-reach-}$ \\ $\mathtt{1d-real}$} & 97.6 & 100.0 & 100.0 & 8,100,000 & 135,518 & 5,000 \\
+\makecell[l]{$\mathtt{robot-grid-reach-}$ \\ $\mathtt{2d-real}$} & 78.9 & 0.0 & 93.3 & 8,100,000 & — & 15,000 \\
+\makecell[l]{$\mathtt{robot-grid-reach-}$ \\ $\mathtt{repeated-with-obstacles-}$ \\ $\mathtt{1d-real}$} & 95.3 & 100.0 & 100.0 & 8,100,000 & 201,089 & 5,000 \\
+\makecell[l]{$\mathtt{robot-grid-reach-}$ \\ $\mathtt{repeated-with-obstacles-}$ \\ $\mathtt{2d-real}$} & 93.3 & 0.0 & 100.0 & 8,100,000 & — & 5,000 \\
+\makecell[l]{$\mathtt{robot\_collect\_samples\_v2-}$ \\ $\mathtt{real}$} & 99.0 & 0.0 & 100.0 & 8,100,000 & — & 5,000 \\
+\makecell[l]{$\mathtt{storage-GF-64-real}$} & 92.3 & 96.3 & 82.2 & 8,100,000 & 1,053,092 & 20,000 \\
+\makecell[l]{$\mathtt{thermostat-F-real}$} & 99.8 & 0.0 & 100.0 & 8,100,000 & — & 5,000 \\
+\makecell[l]{$\mathtt{unordered-visits-}$ \\ $\mathtt{real}$} & 0.6 & 0.0 & 14.6 & 8,100,000 & — & 30,000 \\
+\makecell[l]{$\mathtt{workstation\_resupply\_pb\_1\_pe\_}$} & 56.7 & 100.0 & 100.0 & 8,100,000 & 925 & 5,000 \\
+\makecell[l]{$\mathtt{workstation\_resupply\_pb\_2\_pe\_}$} & 58.4 & 100.0 & 0.1 & 8,100,000 & 2,108 & 20,000 \\
+\makecell[l]{$\mathtt{workstation\_resupply\_pb\_3\_pe\_}$} & 36.0 & 100.0 & 0.2 & 8,100,000 & 5,189 & 10,000 \\
+\end{longtable}
+\end{small}
