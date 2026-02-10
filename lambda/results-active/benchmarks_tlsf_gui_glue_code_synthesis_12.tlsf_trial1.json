@@ -1,0 +1,1 @@
+{"tlsf_file": "benchmarks/tlsf/gui_glue_code_synthesis/12.tlsf", "trial": 1, "status": "error", "error": "Command 'ltlsynt --hide-status --tlsf /tmp/tmp8gkuw80s/input.tlsf > System.hoa' returned non-zero exit status 2."}
