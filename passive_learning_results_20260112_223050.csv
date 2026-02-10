@@ -1,4 +1,0 @@
-tlsf_file,trial,num_traces,sample_size,accuracy,converged
-abcg_arbiter_n_1.tlsf,1,5000,100000,100.0,True
-abcg_arbiter_n_1.tlsf,2,5000,100000,100.0,True
-abcg_arbiter_n_1.tlsf,3,5000,100000,100.0,True

@@ -1,3 +1,0 @@
-file,training_samples,converged_epoch,sample_complexity,test_trace_acc,acceptance,error
-robot_collect_samples_v1-real.tlsf,10000,,,,,training_failed
-arbiter_with_cancel_n_1.tlsf,10000,300.0,3000000.0,1.0,100.0,

@@ -1,3 +1,0 @@
-file,training_samples,converged_epoch,sample_complexity,test_trace_acc,acceptance
-abcg_arbiter_n_1.tlsf,10000,500,5000000,1.0,100.0
-abcg_arbiter_n_2.tlsf,10000,1000,10000000,1.0,100.0
