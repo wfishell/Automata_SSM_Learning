@@ -1,13 +1,11 @@
-"""
-Trace Converter + RPNI Mealy Learner
-Now saves the learned automaton in HOA format.
-"""
+"""Trace Converter + RPNI Mealy Learner Now saves the learned automaton in HOA
+format."""
 
+import sys
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import List, Tuple
 
 from aalpy.learning_algs.deterministic_passive.RPNI import run_RPNI
-from aalpy.utils import convert_i_o_traces_for_RPNI
 
 
 def parse_step(
@@ -106,8 +104,6 @@ def save_mealy_as_hoa(
 
     print(f"[+] Saved HOA automaton with {len(aps)} APs to {filename}")
 
-
-import sys
 
 if __name__ == "__main__":
     if len(sys.argv) < 4:
