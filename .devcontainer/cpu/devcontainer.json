@@ -52,5 +52,8 @@
       ]
     }
   },
-  "postCreateCommand": "pip install --no-cache-dir pre-commit && pre-commit install"
+  "postCreateCommand": "pip install --no-cache-dir pre-commit && pre-commit install",
+  "runArgs": [
+    "--platform=linux/amd64"
+  ]
 }
