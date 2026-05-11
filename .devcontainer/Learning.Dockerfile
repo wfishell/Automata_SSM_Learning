@@ -63,10 +63,11 @@ COPY --from=syfco-builder /usr/local/bin/syfco /usr/local/bin/syfco
 WORKDIR /workdir
 
 # Install Python deps (PyTorch already comes in base image!)
-RUN pip install --no-cache-dir \
-    jinja2 sympy networkx setuptools typing-extensions \
-    torchvision torchaudio torchmetrics \
-    mamba-ssm
+RUN pip install --no-cache-dir packaging ninja wheel \
+    && pip install --no-cache-dir \
+        jinja2 sympy networkx setuptools typing-extensions \
+        torchvision torchaudio torchmetrics \
+    && pip install --no-cache-dir --no-build-isolation mamba-ssm
 
 # Default command
 CMD ["/bin/bash"]

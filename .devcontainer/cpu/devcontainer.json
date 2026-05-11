@@ -1,5 +1,5 @@
 {
-  "name": "Automata_SSM_Learning",
+  "name": "Automata_SSM_Learning (CPU)",
   "image": "ghcr.io/wfishell/automata_ssm_learning:0.1.1",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "features": {
@@ -52,9 +52,5 @@
       ]
     }
   },
-  "postCreateCommand": "pip install --no-cache-dir pre-commit && pre-commit install",
-  "runArgs": [
-    "--gpus",
-    "all"
-  ]
+  "postCreateCommand": "pip install --no-cache-dir pre-commit && pre-commit install"
 }
