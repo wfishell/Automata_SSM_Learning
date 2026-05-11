@@ -25,11 +25,11 @@ WORKDIR /src
 ENV SPOT_VERSION=2.14.1
 ENV SPOT_SHA256=25df8a6af4e4bb3ae67515ac98e3d37c4303a682e33aaa66e72d74b39459a530
 
-RUN wget http://www.lre.epita.fr/dload/spot/spot-${SPOT_VERSION}.tar.gz \
+RUN wget https://www.lrde.epita.fr/dload/spot/spot-${SPOT_VERSION}.tar.gz \
     && echo "${SPOT_SHA256}  spot-${SPOT_VERSION}.tar.gz" | sha256sum -c - \
     && tar xzf spot-${SPOT_VERSION}.tar.gz \
     && cd spot-${SPOT_VERSION} \
-    && ./configure --prefix=/usr/local --enable-python --enable-tools \
+    && ./configure --prefix=/usr/local --enable-python \
     && make -j"$(nproc)" \
     && make install \
     && ldconfig
@@ -62,13 +62,10 @@ COPY --from=syfco-builder /usr/local/bin/syfco /usr/local/bin/syfco
 # Set working directory
 WORKDIR /workdir
 
-# Copy your project into the container
-COPY . /workdir/Automata_SSM_Learning
-
 # Install Python deps (PyTorch already comes in base image!)
 RUN pip install --no-cache-dir \
     jinja2 sympy networkx setuptools typing-extensions \
-    torchvision torchaudio torchtext torchmetrics \
+    torchvision torchaudio torchmetrics \
     mamba-ssm
 
 # Default command

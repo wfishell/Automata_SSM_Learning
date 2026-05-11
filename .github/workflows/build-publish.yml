@@ -1,0 +1,70 @@
+name: Build and publish devcontainer image
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Image tag to push (e.g. 0.1.0). Also pushes :latest."
+        required: true
+        default: "0.1.0"
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Resolve image tags
+        id: tags
+        run: |
+          IMAGE="${REGISTRY}/${IMAGE_NAME}"
+          IMAGE_LC="$(echo "$IMAGE" | tr '[:upper:]' '[:lower:]')"
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/v}"
+          else
+            VERSION="${{ inputs.tag }}"
+          fi
+          {
+            echo "image=${IMAGE_LC}"
+            echo "version=${VERSION}"
+            echo "tags=${IMAGE_LC}:${VERSION},${IMAGE_LC}:latest"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: .devcontainer/Learning.Dockerfile
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.tags.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Summary
+        run: |
+          echo "Pushed:" >> "$GITHUB_STEP_SUMMARY"
+          echo "- \`${{ steps.tags.outputs.image }}:${{ steps.tags.outputs.version }}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "- \`${{ steps.tags.outputs.image }}:latest\`" >> "$GITHUB_STEP_SUMMARY"
