@@ -35,7 +35,6 @@ htmlcov/
 # Automata / synthesis files
 *.hoa
 *.dot
-*.tlsf
 *.txt
 #flake ignore
 .flake8
