@@ -1,5 +1,7 @@
 # Automata_SSM_Learning — Artifact
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20130808.svg)](https://doi.org/10.5281/zenodo.20130808)
+
 Reproducible pipelines for learning automata from TLSF specifications using:
 
 - Active learning (L*-style queries against the synthesized Mealy machine)
