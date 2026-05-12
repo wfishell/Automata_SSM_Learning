@@ -17,6 +17,12 @@ from datetime import datetime
 
 import pandas as pd
 
+# src/pipelines/ -> src/. Sibling scripts live in src/learning/, src/data/, src/scripts/.
+SRC_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TRACE_GEN = os.path.join(SRC_DIR, "data", "Dot_Trace_Generator.py")
+TRACE_CHECKER = os.path.join(SRC_DIR, "scripts", "Trace_Checker.py")
+PASSIVE_MEALY = os.path.join(SRC_DIR, "learning", "Passive_Mealy_Learning.py")
+
 
 def SynthesizeMealy(file_path):
     # Get input/output signal NAMES from syfco (to know which are inputs vs outputs)
@@ -44,9 +50,19 @@ def SynthesizeMealy(file_path):
         .split(",")
     )
 
-    subprocess.run(
-        f"ltlsynt --hide-status --tlsf {file_path} > System.hoa", shell=True, check=True
-    )
+    try:
+        subprocess.run(
+            f"ltlsynt --hide-status --tlsf {file_path} > System.hoa",
+            shell=True,
+            check=True,
+            timeout=30,
+        )
+    except subprocess.TimeoutExpired:
+        raise RuntimeError("[SKIP] synthesis timeout (>30s)")
+    except subprocess.CalledProcessError as e:
+        if e.returncode == 1:
+            raise RuntimeError("[SKIP] unrealizable")
+        raise RuntimeError(f"[SKIP] ltlsynt failed (rc={e.returncode})")
     subprocess.run(
         "autfilt System.hoa --dot > System.dot",
         shell=True,
@@ -84,7 +100,7 @@ def GenerateTraces(dot_file, aps, num_traces, trace_length, output_file):
     subprocess.run(
         [
             "python",
-            "Dot_Trace_Generator.py",
+            TRACE_GEN,
             dot_file,
             "--fmt",
             "dot",
@@ -105,7 +121,7 @@ def GenerateTraces(dot_file, aps, num_traces, trace_length, output_file):
 def CheckTraces(hoa_file, data_file):
     """Run Trace_Checker and parse acceptance percentage from stdout."""
     result = subprocess.run(
-        ["python", "Trace_Checker.py", hoa_file, data_file],
+        ["python", TRACE_CHECKER, hoa_file, data_file],
         capture_output=True,
         text=True,
         check=True,
@@ -124,7 +140,7 @@ def CheckTraces(hoa_file, data_file):
 def PassiveLearning(data_file, inputs, outputs):
     """Run passive Mealy learning on a trace file."""
     subprocess.run(
-        ["python", "Passive_Mealy_Learning.py", data_file, inputs, outputs],
+        ["python", PASSIVE_MEALY, data_file, inputs, outputs],
         check=True,
     )
 
@@ -225,6 +241,7 @@ def run_single_experiment(
 
         return {
             "num_traces": final_traces,
+            "sample_size": final_traces,
             "accuracy": final_acc,
             "converged": (
                 final_acc >= target_accuracy if final_acc is not None else False
@@ -249,7 +266,10 @@ def run_single_experiment(
 
     except Exception as e:
         error_msg = str(e)
-        print(f"    ERROR: {error_msg}")
+        if error_msg.startswith("[SKIP]"):
+            print(f"    {error_msg}")
+        else:
+            print(f"    ERROR: {error_msg}")
         return {
             "num_traces": None,
             "accuracy": None,
@@ -386,13 +406,29 @@ def main(
 
 
 if __name__ == "__main__":
-    benchmark_dir = "/workspaces/Automata_SSM_Learning/TestSet/SyntCompBenchMarks"
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Run passive learning experiments on TLSF files"
+    )
+    parser.add_argument(
+        "--benchmark-dir",
+        "-d",
+        default="symbolic_vs_Gradient_learning_TLSF",
+        help="Directory containing TLSF files (non-recursive)",
+    )
+    parser.add_argument(
+        "--trials", "-t", type=int, default=3, help="Number of trials per file"
+    )
+    parser.add_argument("--output", "-o", help="Output CSV file (default: timestamped)")
+    args = parser.parse_args()
+
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_csv = f"passive_learning_results_{timestamp}.csv"
+    output_csv = args.output or f"passive_learning_results_{timestamp}.csv"
 
     main(
-        benchmark_dir,
-        num_trials=3,
+        args.benchmark_dir,
+        num_trials=args.trials,
         output_csv=output_csv,
         start_traces=5000,
         step_traces=5000,

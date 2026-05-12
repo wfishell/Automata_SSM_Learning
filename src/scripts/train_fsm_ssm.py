@@ -1,11 +1,13 @@
+import pathlib
 import sys
 
-#
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
+
 import torch
 import torch.nn as nn
 
-from data_prep_ssm import prepare_datasets_mealy
-from State_Space_Model import FSM_SSM
+from data.data_prep_ssm import prepare_datasets_mealy
+from models.State_Space_Model import FSM_SSM
 
 # ============================================================
 # Device

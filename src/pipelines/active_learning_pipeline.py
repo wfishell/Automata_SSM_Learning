@@ -12,8 +12,8 @@ import pandas as pd
 ACTIVE_LEARNING_TIMEOUT = 30  # 2 minutes
 NUM_WORKERS = 16  # Number of parallel workers
 
-# Store the directory where the script is run from (where active_learning.py etc. live)
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+# src/pipelines/ -> src/ (one level up). Sibling scripts live in src/learning/, src/data/, src/scripts/.
+SRC_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 class TimeoutError(Exception):
@@ -50,9 +50,19 @@ def SynthesizeMealy(file_path):
         .split(",")
     )
 
-    subprocess.run(
-        f"ltlsynt --hide-status --tlsf {file_path} > System.hoa", shell=True, check=True
-    )
+    try:
+        subprocess.run(
+            f"ltlsynt --hide-status --tlsf {file_path} > System.hoa",
+            shell=True,
+            check=True,
+            timeout=30,
+        )
+    except subprocess.TimeoutExpired:
+        raise RuntimeError("[SKIP] synthesis timeout (>30s)")
+    except subprocess.CalledProcessError as e:
+        if e.returncode == 1:
+            raise RuntimeError("[SKIP] unrealizable")
+        raise RuntimeError(f"[SKIP] ltlsynt failed (rc={e.returncode})")
     subprocess.run(
         "autfilt System.hoa --dot > System.dot",
         shell=True,
@@ -90,8 +100,7 @@ def Active_Learning(
 ):
     """Run active learning and capture the number of queries with timeout."""
     try:
-        # Use absolute path to active_learning.py
-        active_learning_script = os.path.join(SCRIPT_DIR, "active_learning.py")
+        active_learning_script = os.path.join(SRC_DIR, "learning", "active_learning.py")
 
         result = subprocess.run(
             f"python {active_learning_script} {Original_Dot_File} --inputs {Inputs} --outputs {Outputs}",
@@ -125,9 +134,8 @@ def Active_Learning(
 
 def Generate_And_Validate_Data(Learned_Dot_File, APs, Original_System):
     """Generate traces and validate, returning accuracy."""
-    # Use absolute paths to scripts
-    trace_gen_script = os.path.join(SCRIPT_DIR, "Dot_Trace_Generator.py")
-    trace_check_script = os.path.join(SCRIPT_DIR, "Trace_Checker.py")
+    trace_gen_script = os.path.join(SRC_DIR, "data", "Dot_Trace_Generator.py")
+    trace_check_script = os.path.join(SRC_DIR, "scripts", "Trace_Checker.py")
 
     subprocess.run(
         f"python {trace_gen_script} {Learned_Dot_File} --fmt dot --aps {APs} -n 1000 -l 20 --cycle --out Active_Test_Dataset.txt",
@@ -211,7 +219,9 @@ def run_experiment_worker(task):
     }
 
     if error:
-        if "TIMEOUT" in error:
+        if "[SKIP]" in error:
+            print(f"[Worker {os.getpid()}] {tlsf_name} trial {trial}: {error}")
+        elif "TIMEOUT" in error:
             print(f"[Worker {os.getpid()}] {tlsf_name} trial {trial}: TIMEOUT")
         else:
             print(
@@ -232,7 +242,7 @@ def find_tlsf_files_recursive(benchmark_dir):
     for root, dirs, files in os.walk(benchmark_dir):
         for file in files:
             if file.endswith(".tlsf"):
-                full_path = os.path.join(root, file)
+                full_path = os.path.abspath(os.path.join(root, file))
                 # Get relative path from benchmark_dir
                 rel_path = os.path.relpath(full_path, benchmark_dir)
                 # Convert path separators to underscores for the name

@@ -36,6 +36,16 @@ htmlcov/
 *.hoa
 *.dot
 *.txt
+
+# Pipeline result artifacts (timestamped output)
+active_learning_results_*.csv
+passive_learning_results_*.csv
+ssm_learned_results.csv
+ssm_epoch_history.csv
+drift_test_results.json
+drift_control_results.json
+training_results.json
+epoch_*_test_eval.txt
 #flake ignore
 .flake8
 #history ignore

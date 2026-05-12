@@ -1,4 +1,9 @@
-from HOA_SSM import build_arbiter_ssm
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
+
+from models.HOA_SSM import build_arbiter_ssm
 
 model = build_arbiter_ssm(epsilon=0.0)  # No noise to see pure structure
 

@@ -1,5 +1,8 @@
+import pathlib
 import re
 import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
 import numpy as np
 import torch
@@ -8,9 +11,9 @@ from scipy.optimize import linear_sum_assignment
 from sklearn.cluster import KMeans
 from sklearn.preprocessing import StandardScaler
 
-from automaton_state_tracker import parse_hoa_transitions, simulate_trace
-from data_prep_ssm import prepare_datasets_mealy
-from State_Space_Model import FSM_SSM
+from data.automaton_state_tracker import parse_hoa_transitions, simulate_trace
+from data.data_prep_ssm import prepare_datasets_mealy
+from models.State_Space_Model import FSM_SSM
 
 # ============================================================
 # Device

@@ -7,6 +7,11 @@ from pathlib import Path
 
 os.environ["MKL_THREADING_LAYER"] = "GNU"
 
+# src/pipelines/ -> src/. Sibling helpers live under src/data/, src/models/.
+SRC_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TRACE_GEN = os.path.join(SRC_DIR, "data", "Dot_Trace_Generator.py")
+MEALY_TO_MOORE = os.path.join(SRC_DIR, "models", "mealy_to_moore.py")
+
 
 def SynthesizeMealy(file_path):
     input_names = set(
@@ -33,16 +38,19 @@ def SynthesizeMealy(file_path):
         .split(",")
     )
 
+    print("      - ltlsynt: synthesizing System.hoa from TLSF...", flush=True)
     subprocess.run(
         f"ltlsynt --hide-status --tlsf {file_path} > System.hoa", shell=True, check=True
     )
+    print("      - autfilt: System.hoa -> Drift_Test/Arbiter_Mealy.dot...", flush=True)
     subprocess.run(
         "autfilt System.hoa --dot > ./Drift_Test/Arbiter_Mealy.dot",
         shell=True,
         check=True,
     )
+    print("      - mealy_to_moore: Arbiter_Mealy.dot -> Arbiter_Moore.dot...", flush=True)
     subprocess.run(
-        "python mealy_to_moore.py ./Drift_Test/Arbiter_Mealy.dot -o ./Drift_Test/Arbiter_Moore.dot",
+        f"python {MEALY_TO_MOORE} ./Drift_Test/Arbiter_Mealy.dot -o ./Drift_Test/Arbiter_Moore.dot",
         shell=True,
         check=True,
     )
@@ -71,13 +79,15 @@ def SynthesizeMealy(file_path):
 
 
 def GenerateTrainingData(APs, Inputs, Outputs):
+    print("      - Dot_Trace_Generator: 10000 traces of length 50...", flush=True)
     subprocess.run(
-        f"python Dot_Trace_Generator.py Drift_Test/Arbiter_Mealy.dot --fmt dot --aps {APs} -n 10000 -l 50 --cycle --out Drift_Test/Training_Dataset.txt",
+        f"python {TRACE_GEN} Drift_Test/Arbiter_Mealy.dot --fmt dot --aps {APs} -n 10000 -l 50 --cycle --out Drift_Test/Training_Dataset.txt",
         shell=True,
         check=True,
     )
+    print("      - drunk_arbiter_data_gen: injecting drift into traces...", flush=True)
     subprocess.run(
-        f"python Drift_Test/drifting_arbiter_data_gen.py '{Inputs}' '{Outputs}' < Drift_Test/Training_Dataset.txt > Drift_Test/Training_Dataset_Output.txt",
+        f"python Drift_Test/drunk_arbiter_data_gen.py '{Inputs}' '{Outputs}' < Drift_Test/Training_Dataset.txt > Drift_Test/Training_Dataset_Output.txt",
         shell=True,
         check=True,
     )
@@ -85,12 +95,13 @@ def GenerateTrainingData(APs, Inputs, Outputs):
 
 def TrainModel(Inputs, Outputs):
     process = subprocess.Popen(
-        f"python Drift_Test/moore_ssm_training.py --dot Drift_Test/Arbiter_Moore.dot"
+        f"python -u Drift_Test/moore_ssm_training.py --dot Drift_Test/Arbiter_Moore.dot "
         f"--data Drift_Test/Training_Dataset_Output.txt --inputs {Inputs} --outputs {Outputs} --epochs 1000 --epsilon .01 --test-ratio .1 --lr .001 --use-tanh",
         shell=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
+        bufsize=1,
     )
 
     output_lines = []
@@ -114,18 +125,23 @@ def process_single_file(tlsf_file):
     }
 
     try:
+        print("    [1/3] Synthesize Mealy + Moore from TLSF", flush=True)
         APs, inputs, outputs = SynthesizeMealy(tlsf_file)
         results["aps"] = APs
         results["inputs"] = inputs
         results["outputs"] = outputs
+        print(f"      inputs={inputs}  outputs={outputs}", flush=True)
 
+        print("    [2/3] Generate training data (with drift)", flush=True)
         GenerateTrainingData(APs, inputs, outputs)
 
+        print("    [3/3] Train SSM (streaming below)", flush=True)
         training_output = TrainModel(inputs, outputs)
         results["training_output"] = training_output
+        print(f"    -> finished {os.path.basename(str(tlsf_file))}", flush=True)
     except Exception as e:
         results["error"] = str(e)
-        print(f"Error processing {tlsf_file}: {e}")
+        print(f"Error processing {tlsf_file}: {e}", flush=True)
 
     return results
 

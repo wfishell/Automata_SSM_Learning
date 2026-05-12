@@ -6,6 +6,12 @@ import pandas as pd
 
 os.environ["MKL_THREADING_LAYER"] = "GNU"
 
+# src/pipelines/ -> src/. Sibling scripts live in src/data/, src/scripts/.
+SRC_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+TRACE_GEN = os.path.join(SRC_DIR, "data", "Dot_Trace_Generator.py")
+TRACE_CHECKER = os.path.join(SRC_DIR, "scripts", "Trace_Checker.py")
+TRAIN_FSM_SSM = os.path.join(SRC_DIR, "scripts", "train_fsm_ssm.py")
+
 
 def SynthesizeMealy(file_path):
     input_names = set(
@@ -32,9 +38,19 @@ def SynthesizeMealy(file_path):
         .split(",")
     )
 
-    subprocess.run(
-        f"ltlsynt --hide-status --tlsf {file_path} > System.hoa", shell=True, check=True
-    )
+    try:
+        subprocess.run(
+            f"ltlsynt --hide-status --tlsf {file_path} > System.hoa",
+            shell=True,
+            check=True,
+            timeout=30,
+        )
+    except subprocess.TimeoutExpired:
+        raise RuntimeError("[SKIP] synthesis timeout (>30s)")
+    except subprocess.CalledProcessError as e:
+        if e.returncode == 1:
+            raise RuntimeError("[SKIP] unrealizable")
+        raise RuntimeError(f"[SKIP] ltlsynt failed (rc={e.returncode})")
     subprocess.run(
         "autfilt System.hoa --dot > System.dot",
         shell=True,
@@ -70,7 +86,7 @@ def GenerateTraces(
     subprocess.run(
         [
             "python",
-            "Dot_Trace_Generator.py",
+            TRACE_GEN,
             dot_file,
             "--fmt",
             "dot",
@@ -91,7 +107,7 @@ def GenerateTraces(
 def CheckTraces(hoa_file, data_file):
     """Run Trace_Checker and parse acceptance percentage from stdout."""
     result = subprocess.run(
-        ["python", "Trace_Checker.py", hoa_file, data_file],
+        ["python", TRACE_CHECKER, hoa_file, data_file],
         capture_output=True,
         text=True,
         check=True,
@@ -111,19 +127,28 @@ def TrainAndGetResults(inputs, outputs, training_samples):
     - acceptance: trace checker result on final epoch file
     - epoch_history: list of dicts with per-epoch metrics
     """
-    result = subprocess.run(
-        ["python", "train_fsm_ssm.py", inputs, outputs],
-        capture_output=True,
+    proc = subprocess.Popen(
+        ["python", "-u", TRAIN_FSM_SSM, inputs, outputs],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
         text=True,
-        check=True,
+        bufsize=1,
     )
+    captured_lines = []
+    assert proc.stdout is not None
+    for line in proc.stdout:
+        print(f"      {line}", end="", flush=True)
+        captured_lines.append(line)
+    rc = proc.wait()
+    if rc != 0:
+        raise subprocess.CalledProcessError(rc, proc.args)
 
     # Parse training output to find convergence epoch and trace accuracy
     converged_epoch = 1000
     final_trace_acc = 0.0
     epoch_history = []
 
-    for line in result.stdout.splitlines():
+    for line in captured_lines:
         # Match lines like: "Epoch 100 | Loss = 0.1234 | Train Step = 0.95 | Train Trace = 0.90 | Test Step = 0.9500 | Test Trace = 0.9000"
         match = re.search(
             r"Epoch\s+(\d+)\s*\|\s*Loss\s*=\s*([\d.]+)\s*\|.*Test Step\s*=\s*([\d.]+)\s*\|\s*Test Trace\s*=\s*([\d.]+)",
@@ -185,7 +210,9 @@ def cleanup_epoch_files():
 def pipeline(TLSF, training_samples=10000):
     cleanup_epoch_files()
 
+    print(f"    [1/3] Synthesizing Mealy machine from {os.path.basename(TLSF)}...", flush=True)
     APs, Inputs, Outputs = SynthesizeMealy(TLSF)
+    print(f"    [2/3] Generating {training_samples} training traces...", flush=True)
     GenerateTraces(
         "System.dot",
         APs,
@@ -194,21 +221,64 @@ def pipeline(TLSF, training_samples=10000):
         output_file="Training_Dataset.txt",
     )
 
+    print(f"    [3/3] Training SSM (streaming output below)...", flush=True)
     results = TrainAndGetResults(Inputs, Outputs, training_samples)
 
+    print(
+        f"    -> converged at epoch {results['converged_epoch']}, "
+        f"test trace acc {results['test_trace_acc']:.4f}, "
+        f"acceptance {results['acceptance']}",
+        flush=True,
+    )
     return results
 
 
 if __name__ == "__main__":
-    directory = "/workspaces/Automata_SSM_Learning/TestSet/SyntCompBenchMarks"
-    samples = [10000]  # Add your sample sizes
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Run SSM random-init training on TLSF files"
+    )
+    parser.add_argument(
+        "--benchmark-dir",
+        "-d",
+        default="symbolic_vs_Gradient_learning_TLSF",
+        help="Directory containing TLSF files (non-recursive)",
+    )
+    parser.add_argument(
+        "--samples",
+        type=int,
+        nargs="+",
+        default=[10000],
+        help="Training sample sizes to sweep (one or more)",
+    )
+    parser.add_argument(
+        "--summary-csv",
+        default="ssm_learned_results.csv",
+        help="Output CSV for per-file summary",
+    )
+    parser.add_argument(
+        "--history-csv",
+        default="ssm_epoch_history.csv",
+        help="Output CSV for per-epoch history",
+    )
+    args = parser.parse_args()
+
+    directory = args.benchmark_dir
+    samples = args.samples
 
     summary_rows = []
     history_rows = []
 
-    for file in os.listdir(directory):
+    files = sorted(os.listdir(directory))
+    print(f"Found {len(files)} files in {directory}", flush=True)
+    print(f"Sweeping samples: {samples}", flush=True)
+    print("=" * 60, flush=True)
+
+    for file in files:
         full_path = os.path.join(directory, file)
         for sample in samples:
+            print(f"\n>>> {file} | training_samples={sample}", flush=True)
             try:
                 results = pipeline(full_path, sample)
 
@@ -238,7 +308,11 @@ if __name__ == "__main__":
                     )
 
             except Exception as e:
-                print(f"Error on {file} with {sample} samples: {e}")
+                msg = str(e)
+                if msg.startswith("[SKIP]"):
+                    print(f"{file}: {msg}")
+                else:
+                    print(f"Error on {file} with {sample} samples: {e}")
                 summary_rows.append(
                     {
                         "file": file,
@@ -252,12 +326,12 @@ if __name__ == "__main__":
 
     # Save summary results
     df_summary = pd.DataFrame(summary_rows)
-    df_summary.to_csv("ssm_learned_results.csv", index=False)
+    df_summary.to_csv(args.summary_csv, index=False)
     print("=== Summary ===")
     print(df_summary)
 
     # Save per-epoch history
     df_history = pd.DataFrame(history_rows)
-    df_history.to_csv("ssm_epoch_history.csv", index=False)
+    df_history.to_csv(args.history_csv, index=False)
     print("\n=== Epoch History ===")
     print(df_history)

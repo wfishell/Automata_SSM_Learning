@@ -11,12 +11,16 @@ Usage:
 """
 
 import argparse
+import pathlib
 import random
+import sys
 from typing import Dict, List, Optional, Tuple
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
 import torch
 
-from HOA_SSM import ARBITER_HOA, HOA_SSM
+from models.HOA_SSM import ARBITER_HOA, HOA_SSM
 
 # =============================================================================
 # TRACE FORMATTING
