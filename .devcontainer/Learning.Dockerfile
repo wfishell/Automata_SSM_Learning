@@ -55,6 +55,7 @@ FROM base
 
 # Copy Spot from builder
 COPY --from=spot-builder /usr/local /usr/local
+RUN ldconfig
 
 # Copy SyFCo binary
 COPY --from=syfco-builder /usr/local/bin/syfco /usr/local/bin/syfco
