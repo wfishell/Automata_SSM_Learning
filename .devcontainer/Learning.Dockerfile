@@ -68,6 +68,7 @@ RUN pip install --no-cache-dir packaging ninja wheel \
     && pip install --no-cache-dir \
         jinja2 sympy networkx setuptools typing-extensions \
         torchvision torchaudio torchmetrics \
+        aalpy \
     && pip install --no-cache-dir --no-build-isolation mamba-ssm
 
 # Default command
